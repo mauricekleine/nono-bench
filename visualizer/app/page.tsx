@@ -3,11 +3,13 @@
 import {
 	ChartBar,
 	CurrencyDollar,
+	GithubLogo,
 	GridFour,
 	Hash,
 	Target,
 	Timer,
 	Trophy,
+	XLogo,
 } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import {
@@ -168,7 +170,7 @@ function ModelStatsCard({ modelData }: { modelData: ModelData }) {
 						style={{
 							background:
 								MODEL_COLORS[
-									results.byModel.findIndex((m) => m.model === modelData.model)
+								results.byModel.findIndex((m) => m.model === modelData.model)
 								] || MODEL_COLORS[0],
 						}}
 					/>
@@ -400,7 +402,10 @@ export default function Page() {
 									<span className="text-xs text-muted-foreground">
 										Grid Size:
 									</span>
-									<Select value={selectedSize} onValueChange={setSelectedSize}>
+									<Select
+										value={selectedSize}
+										onValueChange={(value) => setSelectedSize(value ?? "all")}
+									>
 										<SelectTrigger className="w-28">
 											<SelectValue />
 										</SelectTrigger>
@@ -582,10 +587,32 @@ export default function Page() {
 				</section>
 
 				{/* Footer */}
-				<footer className="mt-16 pt-8 border-t border-border text-center">
-					<p className="text-xs text-muted-foreground">
-						NonoBench - Nonogram Puzzle Benchmark for LLMs
-					</p>
+				<footer className="mt-16 pt-8 border-t border-border">
+					<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+						<p className="text-xs text-muted-foreground">
+							NonoBench - Nonogram Puzzle Benchmark for LLMs
+						</p>
+						<div className="flex items-center gap-4">
+							<a
+								href="https://github.com/mauricekleine/nono-bench"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+							>
+								<GithubLogo className="size-4" weight="bold" />
+								<span>GitHub</span>
+							</a>
+							<a
+								href="https://x.com/maurice_kleine"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+							>
+								<XLogo className="size-4" weight="bold" />
+								<span>@maurice_kleine</span>
+							</a>
+						</div>
+					</div>
 				</footer>
 			</div>
 		</div>
