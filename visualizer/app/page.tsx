@@ -3,6 +3,7 @@
 import {
 	CaretDown,
 	ChartBar,
+	DownloadSimple,
 	GithubLogo,
 	GridFour,
 	Info,
@@ -308,15 +309,37 @@ export default function Page() {
 						Last updated: {new Date(results.timestamp).toLocaleString()}
 					</p>
 
-					{/* Collapsible About Section */}
+					{/* Action buttons */}
 					<Collapsible open={aboutOpen} onOpenChange={setAboutOpen}>
-						<CollapsibleTrigger className="flex items-center gap-2 mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors">
-							<Question className="size-4" weight="bold" />
-							<span>What are Nonograms?</span>
-							<CaretDown
-								className={`size-3 transition-transform ${aboutOpen ? "rotate-180" : ""}`}
-							/>
-						</CollapsibleTrigger>
+						<div className="flex items-center gap-4 mt-4">
+							<CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+								<Question className="size-4" weight="bold" />
+								<span>What are Nonograms?</span>
+								<CaretDown
+									className={`size-3 transition-transform ${aboutOpen ? "rotate-180" : ""}`}
+								/>
+							</CollapsibleTrigger>
+
+							<button
+								type="button"
+								onClick={() => {
+									const blob = new Blob([JSON.stringify(results, null, 2)], {
+										type: "application/json",
+									});
+									const url = URL.createObjectURL(blob);
+									const a = document.createElement("a");
+									a.href = url;
+									a.download = "nonobench-results.json";
+									a.click();
+									URL.revokeObjectURL(url);
+								}}
+								className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+							>
+								<DownloadSimple className="size-4" weight="bold" />
+								<span>Download JSON</span>
+							</button>
+						</div>
+
 						<CollapsibleContent>
 							<div className="mt-3 p-4 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground space-y-2">
 								<p>
