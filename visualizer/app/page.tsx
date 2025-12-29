@@ -3,9 +3,11 @@
 import {
 	CaretDown,
 	ChartBar,
+	Coffee,
 	DownloadSimple,
 	GithubLogo,
 	GridFour,
+	Heart,
 	Info,
 	Question,
 	Warning,
@@ -162,7 +164,7 @@ function ModelAccordionItem({
 							{modelData.overallCorrect}/{modelData.overallTotal} solved
 						</span>
 						<span className="font-mono text-sm font-bold text-primary">
-							{(modelData.overallAccuracy * 100).toFixed(1)}%
+							{modelData.overallAccuracy.toFixed(1)}%
 						</span>
 					</div>
 				</div>
@@ -209,7 +211,7 @@ function ModelAccordionItem({
 											{sizeData.correct}/{sizeData.total}
 										</span>
 										<span className="font-mono text-sm font-medium w-12 text-right">
-											{(sizeData.accuracy * 100).toFixed(0)}%
+											{sizeData.accuracy.toFixed(0)}%
 										</span>
 									</div>
 								</div>
@@ -247,7 +249,7 @@ export default function Page() {
 				return {
 					model: model.model,
 					displayName: formatModelName(model.model),
-					accuracy: model.overallAccuracy * 100,
+					accuracy: model.overallAccuracy,
 					correct: model.overallCorrect,
 					total: model.overallTotal,
 					avgDuration: totalDuration / model.overallTotal,
@@ -259,7 +261,7 @@ export default function Page() {
 			return {
 				model: model.model,
 				displayName: formatModelName(model.model),
-				accuracy: (sizeData?.accuracy ?? 0) * 100,
+				accuracy: sizeData?.accuracy ?? 0,
 				correct: sizeData?.correct ?? 0,
 				total: sizeData?.total ?? 0,
 				avgDuration: sizeData?.avgDurationMs ?? 0,
@@ -551,7 +553,7 @@ export default function Page() {
 													Avg Accuracy
 												</p>
 												<p className="font-mono text-2xl font-bold">
-													{(avgAccuracy * 100).toFixed(1)}%
+													{avgAccuracy.toFixed(1)}%
 												</p>
 											</div>
 											<div>
@@ -590,8 +592,34 @@ export default function Page() {
 					</div>
 				</section>
 
+				{/* Support Banner */}
+				<div className="mt-12 p-5 rounded-xl bg-linear-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/20">
+					<div className="flex flex-col sm:flex-row items-center gap-4">
+						<div className="p-2.5 rounded-lg bg-amber-500/20">
+							<Coffee className="size-5 text-amber-600 dark:text-amber-400" weight="duotone" />
+						</div>
+						<div className="flex-1 text-center sm:text-left">
+							<p className="text-sm text-foreground">
+								Running benchmarks isn&apos;t cheap.{" "}
+								<span className="text-muted-foreground">
+									If you find this useful and want to support the project, consider buying me a coffee.
+								</span>
+							</p>
+						</div>
+						<a
+							href="https://buymeacoffee.com/mauricekleine"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium transition-colors"
+						>
+							<Heart className="size-4" weight="fill" />
+							<span>Support</span>
+						</a>
+					</div>
+				</div>
+
 				{/* Footer */}
-				<footer className="mt-16 pt-8 border-t border-border">
+				<footer className="mt-8 pt-8 border-t border-border">
 					<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 						<p className="text-xs text-muted-foreground">
 							NonoBench - Nonogram Puzzle Benchmark for LLMs
