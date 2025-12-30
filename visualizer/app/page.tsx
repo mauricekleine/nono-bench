@@ -143,6 +143,19 @@ function getAccuracyForSize(modelData: ModelData, size: string): number {
 	return runs > 0 ? (sizeData.correct / runs) * 100 : 0;
 }
 
+// Helper to get stats for a specific size (excluding failed tests)
+function getSizeStats(modelData: ModelData, size: string) {
+	const sizeData = modelData.bySize.find((s) => s.size === size);
+	if (!sizeData) return { accuracy: 0, correct: 0, runs: 0, failed: 0, avgCost: 0, avgTime: 0 };
+	const runs = sizeData.total - sizeData.failed;
+	const correct = sizeData.correct;
+	const failed = sizeData.failed;
+	const accuracy = runs > 0 ? (correct / runs) * 100 : 0;
+	const avgCost = runs > 0 ? sizeData.totalCost / runs : 0;
+	const avgTime = runs > 0 ? sizeData.avgDurationMs : 0;
+	return { accuracy, correct, runs, failed, avgCost, avgTime };
+}
+
 // Helper to get model stats (excluding failed tests from averages)
 function getModelStats(modelData: ModelData) {
 	const totalDuration = modelData.bySize.reduce(
@@ -561,12 +574,17 @@ export default function Page() {
 						<div className="overflow-x-auto">
 							<table className="w-full text-sm">
 								<thead>
+									{/* Group header row */}
 									<tr className="border-b border-border bg-muted/30">
-										<th className="sticky left-0 bg-muted/30 backdrop-blur-sm text-left font-medium px-4 py-3 border-r border-border">
+										<th
+											rowSpan={2}
+											className="sticky left-0 bg-muted/30 backdrop-blur-sm text-left font-medium px-4 py-3 border-r border-border align-bottom"
+										>
 											Model
 										</th>
 										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none"
+											rowSpan={2}
+											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none align-bottom border-r border-border/50"
 											onClick={() => handleSort("accuracy")}
 										>
 											<div className="flex items-center gap-1">
@@ -574,24 +592,32 @@ export default function Page() {
 												{getSortIcon("accuracy")}
 											</div>
 										</th>
-										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+										<th
+											colSpan={6}
+											className="text-center font-medium px-4 py-2 whitespace-nowrap border-r border-border/50 bg-blue-500/10"
+										>
 											5×5
 										</th>
-										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+										<th
+											colSpan={6}
+											className="text-center font-medium px-4 py-2 whitespace-nowrap border-r border-border/50 bg-emerald-500/10"
+										>
 											10×10
 										</th>
-										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+										<th
+											colSpan={6}
+											className="text-center font-medium px-4 py-2 whitespace-nowrap bg-amber-500/10"
+										>
 											15×15
 										</th>
-										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
-											Runs
-										</th>
-										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
-											Correct
-										</th>
-										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap hover:bg-muted/50 transition-colors select-none"
-										>
+									</tr>
+									{/* Sub-header row */}
+									<tr className="border-b border-border bg-muted/20 text-xs">
+										{/* 5×5 columns */}
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Accuracy</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Runs</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Correct</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">
 											<div className="flex items-center gap-1">
 												Failed
 												<Tooltip>
@@ -599,55 +625,59 @@ export default function Page() {
 														className="p-0.5 rounded hover:bg-muted"
 														onClick={(e) => e.stopPropagation()}
 													>
-														<Info className="size-3.5 text-muted-foreground" weight="bold" />
+														<Info className="size-3 text-muted-foreground" weight="bold" />
 													</TooltipTrigger>
 													<TooltipContent side="top" className="max-w-xs">
-														Failed requests due to various reasons such as invalid JSON responses, timeouts, rate limits, or other API errors.
+														Failed requests due to invalid JSON, timeouts, rate limits, or other API errors.
 													</TooltipContent>
 												</Tooltip>
 											</div>
 										</th>
-										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none"
-											onClick={() => handleSort("totalCost")}
-										>
-											<div className="flex items-center gap-1">
-												Total Cost
-												{getSortIcon("totalCost")}
-											</div>
-										</th>
-										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none"
-											onClick={() => handleSort("avgCost")}
-										>
-											<div className="flex items-center gap-1">
-												Avg Cost
-												{getSortIcon("avgCost")}
-											</div>
-										</th>
-										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none"
-											onClick={() => handleSort("totalTime")}
-										>
-											<div className="flex items-center gap-1">
-												Total Time
-												{getSortIcon("totalTime")}
-											</div>
-										</th>
-										<th
-											className="text-left font-medium px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-muted/50 transition-colors select-none"
-											onClick={() => handleSort("avgTime")}
-										>
-											<div className="flex items-center gap-1">
-												Avg Time
-												{getSortIcon("avgTime")}
-											</div>
-										</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Avg Cost</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5 border-r border-border/50">Avg Time</th>
+										{/* 10×10 columns */}
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Accuracy</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Runs</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Correct</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Failed</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Avg Cost</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5 border-r border-border/50">Avg Time</th>
+										{/* 15×15 columns */}
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Accuracy</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Runs</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Correct</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Failed</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Avg Cost</th>
+										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Avg Time</th>
 									</tr>
 								</thead>
 								<tbody>
 									{sortedModels.map((modelData, index) => {
 										const stats = getModelStats(modelData);
+										const stats5x5 = getSizeStats(modelData, "5x5");
+										const stats10x10 = getSizeStats(modelData, "10x10");
+										const stats15x15 = getSizeStats(modelData, "15x15");
+										const rowColor = getRankColor(index, sortedModels.length);
+
+										const renderAccuracyCell = (sizeStats: ReturnType<typeof getSizeStats>, size: string, bgClass: string) => {
+											const isMax = sizeStats.accuracy > 0 && sizeStats.accuracy === maxAccuracyBySize[size];
+											return (
+												<td className={`text-left px-3 py-3 ${bgClass}`}>
+													<span
+														className="font-mono text-muted-foreground"
+														style={isMax ? {
+															textDecoration: "underline",
+															textDecorationColor: rowColor,
+															textUnderlineOffset: "3px",
+															textDecorationThickness: "2px",
+														} : undefined}
+													>
+														{sizeStats.accuracy.toFixed(0)}%
+													</span>
+												</td>
+											);
+										};
+
 										return (
 											<tr
 												key={modelData.model}
@@ -657,113 +687,74 @@ export default function Page() {
 													<div className="flex items-center gap-2">
 														<div
 															className="w-2.5 h-2.5 mt-0.5 rounded-full shrink-0"
-															style={{
-																background: getRankColor(index, sortedModels.length),
-															}}
+															style={{ background: rowColor }}
 														/>
 														<span className="font-medium truncate">
 															{formatModelName(modelData.model)}
 														</span>
 													</div>
 												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono font-bold text-primary" style={{
-														color: getRankColor(index, sortedModels.length),
-													}}>
+												<td className="text-left px-4 py-3 border-r border-border/50">
+													<span className="font-mono font-bold" style={{ color: rowColor }}>
 														{stats.accuracy.toFixed(1)}%
 													</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													{(() => {
-														const acc = getAccuracyForSize(modelData, "5x5");
-														const isMax = acc > 0 && acc === maxAccuracyBySize["5x5"];
-														return (
-															<span
-																className="font-mono text-muted-foreground"
-																style={isMax ? {
-																	textDecoration: "underline",
-																	textDecorationColor: getRankColor(index, sortedModels.length),
-																	textUnderlineOffset: "3px",
-																	textDecorationThickness: "2px",
-																} : undefined}
-															>
-																{acc.toFixed(0)}%
-															</span>
-														);
-													})()}
+												{/* 5×5 columns */}
+												{renderAccuracyCell(stats5x5, "5x5", "bg-blue-500/5")}
+												<td className="text-left px-3 py-3 bg-blue-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats5x5.runs}</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													{(() => {
-														const acc = getAccuracyForSize(modelData, "10x10");
-														const isMax = acc > 0 && acc === maxAccuracyBySize["10x10"];
-														return (
-															<span
-																className="font-mono text-muted-foreground"
-																style={isMax ? {
-																	textDecoration: "underline",
-																	textDecorationColor: getRankColor(index, sortedModels.length),
-																	textUnderlineOffset: "3px",
-																	textDecorationThickness: "2px",
-																} : undefined}
-															>
-																{acc.toFixed(0)}%
-															</span>
-														);
-													})()}
+												<td className="text-left px-3 py-3 bg-blue-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats5x5.correct}</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													{(() => {
-														const acc = getAccuracyForSize(modelData, "15x15");
-														const isMax = acc > 0 && acc === maxAccuracyBySize["15x15"];
-														return (
-															<span
-																className="font-mono text-muted-foreground"
-																style={isMax ? {
-																	textDecoration: "underline",
-																	textDecorationColor: getRankColor(index, sortedModels.length),
-																	textUnderlineOffset: "3px",
-																	textDecorationThickness: "2px",
-																} : undefined}
-															>
-																{acc.toFixed(0)}%
-															</span>
-														);
-													})()}
-												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{stats.runs}
+												<td className="text-left px-3 py-3 bg-blue-500/5">
+													<span className={`font-mono text-xs ${stats5x5.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
+														{stats5x5.failed}
 													</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{stats.correct}
+												<td className="text-left px-3 py-3 bg-blue-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats5x5.avgCost)}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-blue-500/5 border-r border-border/50">
+													<span className="font-mono text-muted-foreground text-xs">{formatDuration(stats5x5.avgTime)}</span>
+												</td>
+												{/* 10×10 columns */}
+												{renderAccuracyCell(stats10x10, "10x10", "bg-emerald-500/5")}
+												<td className="text-left px-3 py-3 bg-emerald-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats10x10.runs}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-emerald-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats10x10.correct}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-emerald-500/5">
+													<span className={`font-mono text-xs ${stats10x10.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
+														{stats10x10.failed}
 													</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													<span className={`font-mono ${stats.totalFailed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
-														{stats.totalFailed}
+												<td className="text-left px-3 py-3 bg-emerald-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats10x10.avgCost)}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-emerald-500/5 border-r border-border/50">
+													<span className="font-mono text-muted-foreground text-xs">{formatDuration(stats10x10.avgTime)}</span>
+												</td>
+												{/* 15×15 columns */}
+												{renderAccuracyCell(stats15x15, "15x15", "bg-amber-500/5")}
+												<td className="text-left px-3 py-3 bg-amber-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats15x15.runs}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-amber-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{stats15x15.correct}</span>
+												</td>
+												<td className="text-left px-3 py-3 bg-amber-500/5">
+													<span className={`font-mono text-xs ${stats15x15.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
+														{stats15x15.failed}
 													</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{formatCost(stats.totalCost)}
-													</span>
+												<td className="text-left px-3 py-3 bg-amber-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats15x15.avgCost)}</span>
 												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{formatCost(stats.avgCost)}
-													</span>
-												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{formatDuration(stats.totalDuration)}
-													</span>
-												</td>
-												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{formatDuration(stats.avgDuration)}
-													</span>
+												<td className="text-left px-3 py-3 bg-amber-500/5">
+													<span className="font-mono text-muted-foreground text-xs">{formatDuration(stats15x15.avgTime)}</span>
 												</td>
 											</tr>
 										);
