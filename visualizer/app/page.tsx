@@ -218,7 +218,7 @@ export default function Page() {
 
 			<div className="relative max-w-7xl mx-auto px-6 py-12">
 				{/* Header */}
-				<header className="mb-8">
+				<header className="mb-4">
 					<div className="flex items-center gap-3 mb-2">
 						<div className="p-2 bg-primary/20 rounded-lg">
 							<GridFour className="size-6 text-primary" weight="duotone" />
@@ -231,12 +231,9 @@ export default function Page() {
 						Benchmark results for LLM performance on Nonogram puzzle solving.
 						Comparing accuracy, speed, and cost across different grid sizes.
 					</p>
-					<p className="text-xs text-muted-foreground/60 mt-2 font-mono">
-						Last updated: {new Date(results.timestamp).toLocaleString()}
-					</p>
 
 					{/* Benchmark stats */}
-					<div className="flex items-center gap-4 mt-4">
+					<div className="flex items-center gap-4 my-4">
 						<div className="flex items-center gap-1.5 text-xs">
 							<GridFour className="size-3.5 text-primary" weight="duotone" />
 							<span className="text-muted-foreground">Puzzles:</span>
@@ -324,6 +321,9 @@ export default function Page() {
 							</div>
 						</CollapsibleContent>
 					</Collapsible>
+					<p className="text-xs text-muted-foreground/60 mt-6 font-mono">
+						Last updated: {new Date(results.timestamp).toLocaleString()}
+					</p>
 				</header>
 
 				{/* Empty Data Warning */}
