@@ -7,6 +7,73 @@ import { codeBlock } from "common-tags";
 import { z } from "zod";
 import { PUZZLES, type Puzzle } from "./puzzles";
 
+// Load existing results and filter out recently benchmarked models
+const resultsPath = new URL("../visualizer/app/results.json", import.meta.url)
+	.pathname;
+
+type SizeData = {
+	size: string;
+	accuracy: number;
+	correct: number;
+	total: number;
+	avgDurationMs: number;
+	avgTokens: number;
+	totalTokens: number;
+	avgCost: number;
+	totalCost: number;
+};
+
+type ModelData = {
+	model: string;
+	overallAccuracy: number;
+	overallCorrect: number;
+	overallTotal: number;
+	bySize: SizeData[];
+};
+
+type ExistingResults = {
+	timestamp: string;
+	summary: {
+		models: string[];
+		sizes: string[];
+	};
+	byModel: ModelData[];
+	chartData: Array<{ model: string } & SizeData>;
+};
+
+function loadExistingResults(): ExistingResults | null {
+	try {
+		const content = require("fs").readFileSync(resultsPath, "utf-8");
+		return JSON.parse(content) as ExistingResults;
+	} catch {
+		return null;
+	}
+}
+
+function getRecentlyBenchmarkedModels(
+	existingResults: ExistingResults | null,
+): Set<string> {
+	if (!existingResults) return new Set();
+
+	const timestamp = new Date(existingResults.timestamp);
+	const oneMonthAgo = new Date();
+	oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+	if (timestamp > oneMonthAgo) {
+		console.log(
+			`Skipping models benchmarked on ${timestamp.toISOString()} (within last month):`,
+		);
+		console.log(`  ${existingResults.summary.models.join(", ")}`);
+		return new Set(existingResults.summary.models);
+	}
+
+	return new Set();
+}
+
+const existingResults = loadExistingResults();
+
+const recentlyBenchmarked = getRecentlyBenchmarkedModels(existingResults);
+
 const defaultProviderOptions: OpenRouterCompletionSettings = {
 	usage: {
 		include: true,
@@ -16,10 +83,9 @@ const defaultProviderOptions: OpenRouterCompletionSettings = {
 export type Model = {
 	llm: LanguageModel;
 	name: string;
-	reasoning?: boolean;
 };
 
-const MODELS: Model[] = [
+const ALL_MODELS: Model[] = [
 	{
 		llm: openrouter("anthropic/claude-4.5-sonnet", defaultProviderOptions),
 		name: "claude-4.5-sonnet",
@@ -31,6 +97,10 @@ const MODELS: Model[] = [
 	{
 		llm: openrouter("google/gemini-3-flash-preview", defaultProviderOptions),
 		name: "gemini-3-flash-preview",
+	},
+	{
+		llm: openrouter("google/gemini-3-pro-preview", defaultProviderOptions),
+		name: "gemini-3-pro-preview",
 	},
 	{
 		llm: openrouter("moonshotai/kimi-k2", defaultProviderOptions),
@@ -48,7 +118,30 @@ const MODELS: Model[] = [
 		llm: openrouter("z-ai/glm-4.7", defaultProviderOptions),
 		name: "glm-4.7",
 	},
+	{
+		llm: openrouter("x-ai/grok-4", defaultProviderOptions),
+		name: "grok-4",
+	},
+	{
+		llm: openrouter("x-ai/grok-4.1-fast", defaultProviderOptions),
+		name: "grok-4.1-fast",
+	},
 ];
+
+// Filter out models that were recently benchmarked
+const MODELS = ALL_MODELS.filter(
+	(model) => !recentlyBenchmarked.has(model.name),
+);
+
+if (MODELS.length === 0) {
+	console.log("\nAll models have been benchmarked recently. Nothing to do.");
+	process.exit(0);
+}
+
+if (MODELS.length < ALL_MODELS.length) {
+	console.log(`\nRunning benchmark for ${MODELS.length} model(s):`);
+	console.log(`  ${MODELS.map((m) => m.name).join(", ")}\n`);
+}
 
 type BenchmarkResult = {
 	model: string;
@@ -486,16 +579,9 @@ console.log(`Total Tokens:     ${globalTotalTokens.toLocaleString()}`);
 console.log(`Total Cost:       $${globalTotalCost.toFixed(5)}`);
 console.log("=".repeat(60));
 
-// Build JSON export
-const jsonResults: BenchmarkResults = {
-	timestamp: new Date().toISOString(),
-	summary: {
-		models: MODELS.map((m) => m.name),
-		sizes: allSizes,
-	},
-	byModel: [],
-	chartData: [],
-};
+// Build JSON export - start with existing results if available
+const newByModel: BenchmarkResults["byModel"] = [];
+const newChartData: BenchmarkResults["chartData"] = [];
 
 for (const model of MODELS) {
 	const modelStats = statsMap.get(model.name);
@@ -527,7 +613,7 @@ for (const model of MODELS) {
 		};
 
 		bySize.push(sizeData);
-		jsonResults.chartData.push({
+		newChartData.push({
 			model: model.name,
 			...sizeData,
 		});
@@ -536,7 +622,7 @@ for (const model of MODELS) {
 		overallTotal += stats.totalPuzzles;
 	}
 
-	jsonResults.byModel.push({
+	newByModel.push({
 		model: model.name,
 		overallAccuracy: (overallCorrect / overallTotal) * 100,
 		overallCorrect,
@@ -545,8 +631,62 @@ for (const model of MODELS) {
 	});
 }
 
+// Merge with existing results
+const newModelNames = new Set(MODELS.map((m) => m.name));
+const mergedByModel: BenchmarkResults["byModel"] = [];
+const mergedChartData: BenchmarkResults["chartData"] = [];
+
+// First, add existing results for models we didn't just benchmark
+if (existingResults) {
+	for (const modelData of existingResults.byModel) {
+		if (!newModelNames.has(modelData.model)) {
+			mergedByModel.push(modelData);
+		}
+	}
+	for (const chartEntry of existingResults.chartData) {
+		if (!newModelNames.has(chartEntry.model)) {
+			mergedChartData.push(chartEntry);
+		}
+	}
+}
+
+// Then add the new results
+mergedByModel.push(...newByModel);
+mergedChartData.push(...newChartData);
+
+// Combine all model names and sizes
+const allModelNames = [
+	...new Set([
+		...(existingResults?.summary.models ?? []),
+		...MODELS.map((m) => m.name),
+	]),
+];
+const allSizesForSummary = [
+	...new Set([...(existingResults?.summary.sizes ?? []), ...allSizes]),
+].sort((a, b) => {
+	const aNum = Number.parseInt(a.split("x")[0] ?? "0", 10);
+	const bNum = Number.parseInt(b.split("x")[0] ?? "0", 10);
+	return aNum - bNum;
+});
+
+const jsonResults: BenchmarkResults = {
+	timestamp: new Date().toISOString(),
+	summary: {
+		models: allModelNames,
+		sizes: allSizesForSummary,
+	},
+	byModel: mergedByModel,
+	chartData: mergedChartData,
+};
+
 // Write JSON file
 const jsonPath = new URL("../visualizer/app/results.json", import.meta.url)
 	.pathname;
 await Bun.write(jsonPath, JSON.stringify(jsonResults, null, 2));
 console.log(`\nResults written to: ${jsonPath}`);
+if (existingResults) {
+	const keptFromExisting = mergedByModel.length - newByModel.length;
+	console.log(
+		`Merged ${newByModel.length} new model(s) with ${keptFromExisting} existing model(s).`,
+	);
+}

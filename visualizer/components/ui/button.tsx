@@ -42,14 +42,24 @@ function Button({
 	className,
 	variant = "default",
 	size = "default",
+	leadingIcon,
+	trailingIcon,
+	children,
 	...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & {
+	leadingIcon?: React.ReactNode;
+	trailingIcon?: React.ReactNode;
+}) {
 	return (
 		<ButtonPrimitive
 			data-slot="button"
 			className={cn(buttonVariants({ variant, size, className }))}
 			{...props}
-		/>
+		>
+			{leadingIcon && <span className="mr-1">{leadingIcon}</span>}
+			{children}
+			{trailingIcon && <span className="ml-1">{trailingIcon}</span>}
+		</ButtonPrimitive>
 	);
 }
 

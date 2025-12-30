@@ -9,10 +9,14 @@ import {
 	GridFour,
 	Heart,
 	Info,
+	Lightning,
 	Question,
+	Robot,
+	Rows,
 	Warning,
 	XLogo,
 } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
 	Bar,
@@ -23,12 +27,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -96,7 +94,7 @@ const chartConfig = {
 function getRankColor(rank: number, total: number): string {
 	// Primary color in dark mode: oklch(0.75 0.18 160)
 	const maxLightness = 0.78;
-	const minLightness = 0.45;
+	const minLightness = 0.4;
 	const maxChroma = 0.20;
 	const minChroma = 0.10;
 	const hue = 160; // teal-green hue matching primary
@@ -124,11 +122,14 @@ function formatCost(cost: number): string {
 	return `$${cost.toFixed(2)}`;
 }
 
-function ModelAccordionItem({
-	modelData,
-	rank,
-	totalModels,
-}: { modelData: ModelData; rank: number; totalModels: number }) {
+// Helper to get accuracy for a specific size
+function getAccuracyForSize(modelData: ModelData, size: string): number {
+	const sizeData = modelData.bySize.find((s) => s.size === size);
+	return sizeData?.accuracy ?? 0;
+}
+
+// Helper to get model stats
+function getModelStats(modelData: ModelData) {
 	const totalDuration = modelData.bySize.reduce(
 		(sum, s) => sum + s.avgDurationMs * s.total,
 		0,
@@ -136,92 +137,7 @@ function ModelAccordionItem({
 	const totalPuzzles = modelData.overallTotal;
 	const avgDuration = totalDuration / totalPuzzles;
 	const totalCost = modelData.bySize.reduce((sum, s) => sum + s.totalCost, 0);
-	const totalTokens = modelData.bySize.reduce(
-		(sum, s) => sum + s.totalTokens,
-		0,
-	);
-
-	return (
-		<AccordionItem value={modelData.model} className="border-b border-border last:border-b-0">
-			<AccordionTrigger className="hover:no-underline cursor-pointer px-4 py-3">
-				<div className="flex items-center gap-3 flex-1">
-					<div
-						className="w-3 h-3 rounded-full shrink-0"
-						style={{
-							background: getRankColor(rank, totalModels),
-						}}
-					/>
-					<span className="font-medium text-sm">
-						{formatModelName(modelData.model)}
-					</span>
-					<div className="flex items-center gap-4 ml-auto mr-4">
-						{/* Desktop: show stats inline */}
-						<div className="hidden md:flex items-center gap-4 text-xs text-muted-foreground">
-							<span><span className="font-mono">{formatDuration(avgDuration)}</span> <span className="opacity-60">avg</span></span>
-							<span><span className="font-mono">{formatCost(totalCost)}</span> <span className="opacity-60">total</span></span>
-						</div>
-						<span className="text-xs text-muted-foreground hidden sm:inline">
-							{modelData.overallCorrect}/{modelData.overallTotal} solved
-						</span>
-						<span className="font-mono text-sm font-bold text-primary">
-							{modelData.overallAccuracy.toFixed(1)}%
-						</span>
-					</div>
-				</div>
-			</AccordionTrigger>
-			<AccordionContent className="px-4">
-				<div className="pt-2 pb-2 space-y-4">
-					{/* Mobile: show stats in accordion content */}
-					<div className="grid grid-cols-3 gap-4 md:hidden">
-						<div>
-							<p className="text-muted-foreground text-[10px] uppercase tracking-wide">
-								Avg Time
-							</p>
-							<p className="font-mono text-sm">{formatDuration(avgDuration)}</p>
-						</div>
-						<div>
-							<p className="text-muted-foreground text-[10px] uppercase tracking-wide">
-								Total Cost
-							</p>
-							<p className="font-mono text-sm">{formatCost(totalCost)}</p>
-						</div>
-						<div>
-							<p className="text-muted-foreground text-[10px] uppercase tracking-wide">
-								Tokens
-							</p>
-							<p className="font-mono text-sm">{totalTokens.toLocaleString()}</p>
-						</div>
-					</div>
-
-					<div className="pt-3 md:pt-0 border-t md:border-t-0 border-border">
-						<p className="text-muted-foreground text-[10px] uppercase tracking-wide mb-2">
-							By Grid Size
-						</p>
-						<div className="space-y-2">
-							{modelData.bySize.map((sizeData) => (
-								<div
-									key={sizeData.size}
-									className="flex items-center justify-between"
-								>
-									<span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">
-										{sizeData.size}
-									</span>
-									<div className="flex items-center gap-3">
-										<span className="text-xs text-muted-foreground">
-											{sizeData.correct}/{sizeData.total}
-										</span>
-										<span className="font-mono text-sm font-medium w-12 text-right">
-											{sizeData.accuracy.toFixed(0)}%
-										</span>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
-			</AccordionContent>
-		</AccordionItem>
-	);
+	return { avgDuration, totalCost };
 }
 
 export default function Page() {
@@ -285,6 +201,14 @@ export default function Page() {
 		);
 	}, []);
 
+	// Calculate benchmark stats
+	const benchmarkStats = useMemo(() => {
+		const totalModels = results.summary.models.length;
+		const puzzlesPerModel = results.byModel[0]?.overallTotal ?? 0;
+		const totalRuns = totalModels * puzzlesPerModel;
+		return { totalModels, totalPuzzles: puzzlesPerModel, totalRuns };
+	}, []);
+
 	return (
 		<div className="min-h-screen bg-background">
 			{/* Grid pattern background for Nonogram theme */}
@@ -311,16 +235,43 @@ export default function Page() {
 						Last updated: {new Date(results.timestamp).toLocaleString()}
 					</p>
 
+					{/* Benchmark stats */}
+					<div className="flex items-center gap-4 mt-4">
+						<div className="flex items-center gap-1.5 text-xs">
+							<GridFour className="size-3.5 text-primary" weight="duotone" />
+							<span className="text-muted-foreground">Puzzles:</span>
+							<span className="font-mono font-medium text-foreground">{benchmarkStats.totalPuzzles}</span>
+						</div>
+						<div className="flex items-center gap-1.5 text-xs">
+							<Robot className="size-3.5 text-primary" weight="duotone" />
+							<span className="text-muted-foreground">Models:</span>
+							<span className="font-mono font-medium text-foreground">{benchmarkStats.totalModels}</span>
+						</div>
+						<div className="flex items-center gap-1.5 text-xs">
+							<Lightning className="size-3.5 text-primary" weight="duotone" />
+							<span className="text-muted-foreground">Total runs:</span>
+							<span className="font-mono font-medium text-foreground">{benchmarkStats.totalRuns}</span>
+						</div>
+					</div>
+
 					{/* Action buttons */}
 					<Collapsible open={aboutOpen} onOpenChange={setAboutOpen}>
-						<div className="flex items-center gap-4 mt-4">
-							<CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+						<div className="flex flex-wrap items-center gap-2 mt-4">
+							<CollapsibleTrigger className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all cursor-pointer whitespace-nowrap">
 								<Question className="size-4" weight="bold" />
 								<span>What are Nonograms?</span>
 								<CaretDown
 									className={`size-3 transition-transform ${aboutOpen ? "rotate-180" : ""}`}
 								/>
 							</CollapsibleTrigger>
+
+							<Link
+								href="/puzzles"
+								className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all whitespace-nowrap"
+							>
+								<Rows className="size-4" weight="bold" />
+								<span>Explore Puzzles</span>
+							</Link>
 
 							<button
 								type="button"
@@ -335,10 +286,10 @@ export default function Page() {
 									a.click();
 									URL.revokeObjectURL(url);
 								}}
-								className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+								className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all cursor-pointer whitespace-nowrap"
 							>
 								<DownloadSimple className="size-4" weight="bold" />
-								<span>Download JSON</span>
+								<span>Download Results</span>
 							</button>
 						</div>
 
@@ -490,21 +441,99 @@ export default function Page() {
 					</Card>
 				</section>
 
-				{/* Per-Model Stats (Accordion) */}
+				{/* Per-Model Stats (Table) */}
 				<section>
 					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
 						Detailed Model Statistics
 					</h2>
-					<Accordion className="border-none">
-						{sortedModels.map((modelData, index) => (
-							<ModelAccordionItem
-								key={modelData.model}
-								modelData={modelData}
-								rank={index}
-								totalModels={sortedModels.length}
-							/>
-						))}
-					</Accordion>
+					<div className="rounded-lg border border-border bg-card overflow-hidden">
+						<div className="overflow-x-auto">
+							<table className="w-full text-sm">
+								<thead>
+									<tr className="border-b border-border bg-muted/30">
+										<th className="sticky left-0 bg-muted/30 backdrop-blur-sm text-left font-medium px-4 py-3 border-r border-border">
+											Model
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											Overall
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											5×5
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											10×10
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											15×15
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											Total Cost
+										</th>
+										<th className="text-left font-medium px-4 py-3 whitespace-nowrap">
+											Avg Time
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{sortedModels.map((modelData, index) => {
+										const stats = getModelStats(modelData);
+										return (
+											<tr
+												key={modelData.model}
+												className="border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+											>
+												<td className="sticky left-0 bg-card/30 backdrop-blur-sm px-4 py-3 border-r border-border">
+													<div className="flex items-center gap-2">
+														<div
+															className="w-2.5 h-2.5 mt-0.5 rounded-full shrink-0"
+															style={{
+																background: getRankColor(index, sortedModels.length),
+															}}
+														/>
+														<span className="font-medium truncate">
+															{formatModelName(modelData.model)}
+														</span>
+													</div>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono font-bold text-primary" style={{
+														color: getRankColor(index, sortedModels.length),
+													}}>
+														{modelData.overallAccuracy.toFixed(1)}%
+													</span>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono text-muted-foreground">
+														{getAccuracyForSize(modelData, "5x5").toFixed(0)}%
+													</span>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono text-muted-foreground">
+														{getAccuracyForSize(modelData, "10x10").toFixed(0)}%
+													</span>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono text-muted-foreground">
+														{getAccuracyForSize(modelData, "15x15").toFixed(0)}%
+													</span>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono text-muted-foreground">
+														{formatCost(stats.totalCost)}
+													</span>
+												</td>
+												<td className="text-left px-4 py-3">
+													<span className="font-mono text-muted-foreground">
+														{formatDuration(stats.avgDuration)}
+													</span>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</section>
 
 				{/* Per-Size Stats */}
