@@ -135,10 +135,12 @@ function formatCost(cost: number): string {
 	return `$${cost.toFixed(2)}`;
 }
 
-// Helper to get accuracy for a specific size
+// Helper to get accuracy for a specific size (excluding failed tests)
 function getAccuracyForSize(modelData: ModelData, size: string): number {
 	const sizeData = modelData.bySize.find((s) => s.size === size);
-	return sizeData?.accuracy ?? 0;
+	if (!sizeData) return 0;
+	const runs = sizeData.total - sizeData.failed;
+	return runs > 0 ? (sizeData.correct / runs) * 100 : 0;
 }
 
 // Helper to get model stats (excluding failed tests from averages)
@@ -295,6 +297,20 @@ export default function Page() {
 			return primaryResult;
 		});
 	}, [sortColumn, sortDirection]);
+
+	// Calculate max accuracy for each size column (for highlighting)
+	const maxAccuracyBySize = useMemo(() => {
+		const sizes = ["5x5", "10x10", "15x15"] as const;
+		const maxValues: Record<string, number> = {};
+
+		for (const size of sizes) {
+			maxValues[size] = Math.max(
+				...results.byModel.map((model) => getAccuracyForSize(model, size))
+			);
+		}
+
+		return maxValues;
+	}, []);
 
 	// Calculate benchmark stats
 	const benchmarkStats = useMemo(() => {
@@ -658,19 +674,61 @@ export default function Page() {
 													</span>
 												</td>
 												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{getAccuracyForSize(modelData, "5x5").toFixed(0)}%
-													</span>
+													{(() => {
+														const acc = getAccuracyForSize(modelData, "5x5");
+														const isMax = acc > 0 && acc === maxAccuracyBySize["5x5"];
+														return (
+															<span
+																className="font-mono text-muted-foreground"
+																style={isMax ? {
+																	textDecoration: "underline",
+																	textDecorationColor: getRankColor(index, sortedModels.length),
+																	textUnderlineOffset: "3px",
+																	textDecorationThickness: "2px",
+																} : undefined}
+															>
+																{acc.toFixed(0)}%
+															</span>
+														);
+													})()}
 												</td>
 												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{getAccuracyForSize(modelData, "10x10").toFixed(0)}%
-													</span>
+													{(() => {
+														const acc = getAccuracyForSize(modelData, "10x10");
+														const isMax = acc > 0 && acc === maxAccuracyBySize["10x10"];
+														return (
+															<span
+																className="font-mono text-muted-foreground"
+																style={isMax ? {
+																	textDecoration: "underline",
+																	textDecorationColor: getRankColor(index, sortedModels.length),
+																	textUnderlineOffset: "3px",
+																	textDecorationThickness: "2px",
+																} : undefined}
+															>
+																{acc.toFixed(0)}%
+															</span>
+														);
+													})()}
 												</td>
 												<td className="text-left px-4 py-3">
-													<span className="font-mono text-muted-foreground">
-														{getAccuracyForSize(modelData, "15x15").toFixed(0)}%
-													</span>
+													{(() => {
+														const acc = getAccuracyForSize(modelData, "15x15");
+														const isMax = acc > 0 && acc === maxAccuracyBySize["15x15"];
+														return (
+															<span
+																className="font-mono text-muted-foreground"
+																style={isMax ? {
+																	textDecoration: "underline",
+																	textDecorationColor: getRankColor(index, sortedModels.length),
+																	textUnderlineOffset: "3px",
+																	textDecorationThickness: "2px",
+																} : undefined}
+															>
+																{acc.toFixed(0)}%
+															</span>
+														);
+													})()}
 												</td>
 												<td className="text-left px-4 py-3">
 													<span className="font-mono text-muted-foreground">
@@ -730,16 +788,19 @@ export default function Page() {
 								(sum, s) => sum + s.correct,
 								0,
 							);
-							const totalPuzzles = sizeStats.reduce(
-								(sum, s) => sum + s.total,
+							// Exclude failed tests from totals
+							const totalRuns = sizeStats.reduce(
+								(sum, s) => sum + s.total - s.failed,
 								0,
 							);
-							const avgAccuracy =
-								sizeStats.reduce((sum, s) => sum + s.accuracy, 0) /
-								sizeStats.length;
-							const avgDuration =
-								sizeStats.reduce((sum, s) => sum + s.avgDurationMs, 0) /
-								sizeStats.length;
+							// Calculate accuracy excluding failed tests
+							const avgAccuracy = totalRuns > 0 ? (totalCorrect / totalRuns) * 100 : 0;
+							// Calculate total duration and average excluding failed
+							const totalDuration = sizeStats.reduce(
+								(sum, s) => sum + s.avgDurationMs * s.total,
+								0,
+							);
+							const avgDuration = totalRuns > 0 ? totalDuration / totalRuns : 0;
 							const totalCost = sizeStats.reduce(
 								(sum, s) => sum + s.totalCost,
 								0,
@@ -770,7 +831,7 @@ export default function Page() {
 												<p className="font-mono text-2xl font-bold">
 													{totalCorrect}
 													<span className="text-muted-foreground text-sm">
-														/{totalPuzzles}
+														/{totalRuns}
 													</span>
 												</p>
 											</div>
