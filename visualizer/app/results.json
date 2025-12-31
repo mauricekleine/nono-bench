@@ -1,21 +1,21 @@
 {
-  "timestamp": "2025-12-30T20:41:11.632Z",
+  "timestamp": "2025-12-31T00:01:04.632Z",
   "summary": {
     "models": [
-      "gpt-5.2",
       "gpt-5.2-pro-high",
+      "gpt-5.2",
       "gpt-5.2-pro",
+      "gpt-5.2-xhigh",
       "claude-4.5-opus-thinking-high",
       "gpt-5.2-high",
-      "gpt-5.2-xhigh",
       "gemini-3-pro-preview",
       "grok-4",
       "gpt-oss-120b",
       "grok-4.1-fast",
       "kimi-k2-thinking",
       "minimax-m2.1",
-      "olmo-3.1-32b-think",
       "glm-4.7",
+      "olmo-3.1-32b-think",
       "seed-1.6-flash",
       "claude-4.5-sonnet",
       "claude-4.5-opus",
@@ -33,6 +33,54 @@
     ]
   },
   "byModel": [
+    {
+      "model": "gpt-5.2-pro-high",
+      "overallAccuracy": 66.66666666666666,
+      "overallCorrect": 20,
+      "overallFailed": 7,
+      "overallTotal": 30,
+      "bySize": [
+        {
+          "size": "5x5",
+          "timestamp": "2025-12-30T13:31:41.633Z",
+          "accuracy": 100,
+          "correct": 10,
+          "failed": 0,
+          "total": 10,
+          "avgDurationMs": 157288.2881,
+          "avgTokens": 2407.7,
+          "totalTokens": 24077,
+          "avgCost": 0.41168820000000006,
+          "totalCost": 4.116882
+        },
+        {
+          "size": "10x10",
+          "timestamp": "2025-12-30T18:37:57.261Z",
+          "accuracy": 70,
+          "correct": 7,
+          "failed": 1,
+          "total": 10,
+          "avgDurationMs": 1465817.0125916,
+          "avgTokens": 23832.3,
+          "totalTokens": 238323,
+          "avgCost": 4.0126254,
+          "totalCost": 40.126254
+        },
+        {
+          "size": "15x15",
+          "timestamp": "2025-12-30T22:45:22.246Z",
+          "accuracy": 30,
+          "correct": 3,
+          "failed": 6,
+          "total": 10,
+          "avgDurationMs": 1484487.4049250002,
+          "avgTokens": 7694.1,
+          "totalTokens": 76941,
+          "avgCost": 1.297128,
+          "totalCost": 12.97128
+        }
+      ]
+    },
     {
       "model": "gpt-5.2",
       "overallAccuracy": 60,
@@ -82,58 +130,10 @@
       ]
     },
     {
-      "model": "gpt-5.2-pro-high",
+      "model": "gpt-5.2-pro",
       "overallAccuracy": 60,
       "overallCorrect": 18,
-      "overallFailed": 10,
-      "overallTotal": 30,
-      "bySize": [
-        {
-          "size": "5x5",
-          "timestamp": "2025-12-30T13:31:41.633Z",
-          "accuracy": 100,
-          "correct": 10,
-          "failed": 0,
-          "total": 10,
-          "avgDurationMs": 157288.2881,
-          "avgTokens": 2407.7,
-          "totalTokens": 24077,
-          "avgCost": 0.41168820000000006,
-          "totalCost": 4.116882
-        },
-        {
-          "size": "10x10",
-          "timestamp": "2025-12-30T18:37:57.261Z",
-          "accuracy": 70,
-          "correct": 7,
-          "failed": 1,
-          "total": 10,
-          "avgDurationMs": 1465817.0125916,
-          "avgTokens": 23832.3,
-          "totalTokens": 238323,
-          "avgCost": 4.0126254,
-          "totalCost": 40.126254
-        },
-        {
-          "size": "15x15",
-          "timestamp": "2025-12-30T20:12:28.736Z",
-          "accuracy": 10,
-          "correct": 1,
-          "failed": 9,
-          "total": 10,
-          "avgDurationMs": 567179.3292249003,
-          "avgTokens": 4929.4,
-          "totalTokens": 49294,
-          "avgCost": 0.8292816000000001,
-          "totalCost": 8.292816
-        }
-      ]
-    },
-    {
-      "model": "gpt-5.2-pro",
-      "overallAccuracy": 56.666666666666664,
-      "overallCorrect": 17,
-      "overallFailed": 9,
+      "overallFailed": 6,
       "overallTotal": 30,
       "bySize": [
         {
@@ -164,16 +164,64 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T20:26:16.994Z",
-          "accuracy": 10,
-          "correct": 1,
-          "failed": 9,
+          "timestamp": "2025-12-30T23:00:15.806Z",
+          "accuracy": 20,
+          "correct": 2,
+          "failed": 6,
           "total": 10,
-          "avgDurationMs": 586667.0122708001,
-          "avgTokens": 4357.1,
-          "totalTokens": 43571,
-          "avgCost": 0.7331352,
-          "totalCost": 7.331352
+          "avgDurationMs": 1510504.5723418999,
+          "avgTokens": 6905.4,
+          "totalTokens": 69054,
+          "avgCost": 1.1646264,
+          "totalCost": 11.646264
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2-xhigh",
+      "overallAccuracy": 56.666666666666664,
+      "overallCorrect": 17,
+      "overallFailed": 8,
+      "overallTotal": 30,
+      "bySize": [
+        {
+          "size": "5x5",
+          "timestamp": "2025-12-30T13:37:17.685Z",
+          "accuracy": 90,
+          "correct": 9,
+          "failed": 0,
+          "total": 10,
+          "avgDurationMs": 190893.7849875,
+          "avgTokens": 7027.3,
+          "totalTokens": 70273,
+          "avgCost": 0.09898175000000001,
+          "totalCost": 0.9898175
+        },
+        {
+          "size": "10x10",
+          "timestamp": "2025-12-30T19:25:52.700Z",
+          "accuracy": 60,
+          "correct": 6,
+          "failed": 2,
+          "total": 10,
+          "avgDurationMs": 1064744.9427542002,
+          "avgTokens": 24937.1,
+          "totalTokens": 249371,
+          "avgCost": 0.3497683,
+          "totalCost": 3.497683
+        },
+        {
+          "size": "15x15",
+          "timestamp": "2025-12-30T23:48:04.580Z",
+          "accuracy": 20,
+          "correct": 2,
+          "failed": 6,
+          "total": 10,
+          "avgDurationMs": 1637272.3368207996,
+          "avgTokens": 9962.6,
+          "totalTokens": 99626,
+          "avgCost": 0.139853,
+          "totalCost": 1.39853
         }
       ]
     },
@@ -229,7 +277,7 @@
       "model": "gpt-5.2-high",
       "overallAccuracy": 53.333333333333336,
       "overallCorrect": 16,
-      "overallFailed": 9,
+      "overallFailed": 7,
       "overallTotal": 30,
       "bySize": [
         {
@@ -260,64 +308,16 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T20:33:29.661Z",
+          "timestamp": "2025-12-30T22:23:00.933Z",
           "accuracy": 10,
           "correct": 1,
-          "failed": 9,
+          "failed": 7,
           "total": 10,
-          "avgDurationMs": 868154.3411293002,
-          "avgTokens": 3119.6,
-          "totalTokens": 31196,
-          "avgCost": 0.0437696,
-          "totalCost": 0.437696
-        }
-      ]
-    },
-    {
-      "model": "gpt-5.2-xhigh",
-      "overallAccuracy": 53.333333333333336,
-      "overallCorrect": 16,
-      "overallFailed": 11,
-      "overallTotal": 30,
-      "bySize": [
-        {
-          "size": "5x5",
-          "timestamp": "2025-12-30T13:37:17.685Z",
-          "accuracy": 90,
-          "correct": 9,
-          "failed": 0,
-          "total": 10,
-          "avgDurationMs": 190893.7849875,
-          "avgTokens": 7027.3,
-          "totalTokens": 70273,
-          "avgCost": 0.09898175000000001,
-          "totalCost": 0.9898175
-        },
-        {
-          "size": "10x10",
-          "timestamp": "2025-12-30T19:25:52.700Z",
-          "accuracy": 60,
-          "correct": 6,
-          "failed": 2,
-          "total": 10,
-          "avgDurationMs": 1064744.9427542002,
-          "avgTokens": 24937.1,
-          "totalTokens": 249371,
-          "avgCost": 0.3497683,
-          "totalCost": 3.497683
-        },
-        {
-          "size": "15x15",
-          "timestamp": "2025-12-30T20:11:00.698Z",
-          "accuracy": 10,
-          "correct": 1,
-          "failed": 9,
-          "total": 10,
-          "avgDurationMs": 334943.0743874998,
-          "avgTokens": 4310.1,
-          "totalTokens": 43101,
-          "avgCost": 0.06043659999999999,
-          "totalCost": 0.604366
+          "avgDurationMs": 1525255.5536126,
+          "avgTokens": 5080.9,
+          "totalTokens": 50809,
+          "avgCost": 0.07141225,
+          "totalCost": 0.7141225
         }
       ]
     },
@@ -404,12 +404,12 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T20:30:10.549Z",
+          "timestamp": "2025-12-30T21:00:01.366Z",
           "accuracy": 0,
           "correct": 0,
           "failed": 5,
           "total": 10,
-          "avgDurationMs": 990354.6876126999,
+          "avgDurationMs": 1169424.8535835,
           "avgTokens": 13722.7,
           "totalTokens": 137227,
           "avgCost": 0.20701394999999997,
@@ -610,54 +610,6 @@
       ]
     },
     {
-      "model": "olmo-3.1-32b-think",
-      "overallAccuracy": 14.814814814814813,
-      "overallCorrect": 4,
-      "overallFailed": 4,
-      "overallTotal": 27,
-      "bySize": [
-        {
-          "size": "5x5",
-          "timestamp": "2025-12-30T14:57:20.671Z",
-          "accuracy": 40,
-          "correct": 4,
-          "failed": 0,
-          "total": 10,
-          "avgDurationMs": 584350.5904625,
-          "avgTokens": 13397.4,
-          "totalTokens": 133974,
-          "avgCost": 0,
-          "totalCost": 0
-        },
-        {
-          "size": "10x10",
-          "timestamp": "2025-12-30T18:36:43.201Z",
-          "accuracy": 0,
-          "correct": 0,
-          "failed": 0,
-          "total": 10,
-          "avgDurationMs": 1284252.8306709002,
-          "avgTokens": 24077.1,
-          "totalTokens": 240771,
-          "avgCost": 0,
-          "totalCost": 0
-        },
-        {
-          "size": "15x15",
-          "timestamp": "2025-12-30T20:39:28.466Z",
-          "accuracy": 0,
-          "correct": 0,
-          "failed": 4,
-          "total": 7,
-          "avgDurationMs": 1052179.4448274283,
-          "avgTokens": 10543.857142857143,
-          "totalTokens": 73807,
-          "avgCost": 0,
-          "totalCost": 0
-        }
-      ]
-    },
-    {
       "model": "glm-4.7",
       "overallAccuracy": 13.333333333333334,
       "overallCorrect": 4,
@@ -702,6 +654,54 @@
           "totalTokens": 272254,
           "avgCost": 0.058674984,
           "totalCost": 0.58674984
+        }
+      ]
+    },
+    {
+      "model": "olmo-3.1-32b-think",
+      "overallAccuracy": 13.333333333333334,
+      "overallCorrect": 4,
+      "overallFailed": 5,
+      "overallTotal": 30,
+      "bySize": [
+        {
+          "size": "5x5",
+          "timestamp": "2025-12-30T14:57:20.671Z",
+          "accuracy": 40,
+          "correct": 4,
+          "failed": 0,
+          "total": 10,
+          "avgDurationMs": 584350.5904625,
+          "avgTokens": 13397.4,
+          "totalTokens": 133974,
+          "avgCost": 0,
+          "totalCost": 0
+        },
+        {
+          "size": "10x10",
+          "timestamp": "2025-12-30T18:36:43.201Z",
+          "accuracy": 0,
+          "correct": 0,
+          "failed": 0,
+          "total": 10,
+          "avgDurationMs": 1284252.8306709002,
+          "avgTokens": 24077.1,
+          "totalTokens": 240771,
+          "avgCost": 0,
+          "totalCost": 0
+        },
+        {
+          "size": "15x15",
+          "timestamp": "2025-12-30T21:34:57.696Z",
+          "accuracy": 0,
+          "correct": 0,
+          "failed": 5,
+          "total": 10,
+          "avgDurationMs": 1069440.1253625,
+          "avgTokens": 12444.5,
+          "totalTokens": 124445,
+          "avgCost": 0,
+          "totalCost": 0
         }
       ]
     },
@@ -1506,16 +1506,16 @@
     {
       "model": "gpt-5.2-high",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:33:29.661Z",
+      "timestamp": "2025-12-30T22:23:00.933Z",
       "accuracy": 10,
       "correct": 1,
-      "failed": 9,
+      "failed": 7,
       "total": 10,
-      "avgDurationMs": 868154.3411293002,
-      "avgTokens": 3119.6,
-      "totalTokens": 31196,
-      "avgCost": 0.0437696,
-      "totalCost": 0.437696
+      "avgDurationMs": 1525255.5536126,
+      "avgTokens": 5080.9,
+      "totalTokens": 50809,
+      "avgCost": 0.07141225,
+      "totalCost": 0.7141225
     },
     {
       "model": "gpt-5.2-pro",
@@ -1548,16 +1548,16 @@
     {
       "model": "gpt-5.2-pro",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:26:16.994Z",
-      "accuracy": 10,
-      "correct": 1,
-      "failed": 9,
+      "timestamp": "2025-12-30T23:00:15.806Z",
+      "accuracy": 20,
+      "correct": 2,
+      "failed": 6,
       "total": 10,
-      "avgDurationMs": 586667.0122708001,
-      "avgTokens": 4357.1,
-      "totalTokens": 43571,
-      "avgCost": 0.7331352,
-      "totalCost": 7.331352
+      "avgDurationMs": 1510504.5723418999,
+      "avgTokens": 6905.4,
+      "totalTokens": 69054,
+      "avgCost": 1.1646264,
+      "totalCost": 11.646264
     },
     {
       "model": "gpt-5.2-pro-high",
@@ -1590,16 +1590,16 @@
     {
       "model": "gpt-5.2-pro-high",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:12:28.736Z",
-      "accuracy": 10,
-      "correct": 1,
-      "failed": 9,
+      "timestamp": "2025-12-30T22:45:22.246Z",
+      "accuracy": 30,
+      "correct": 3,
+      "failed": 6,
       "total": 10,
-      "avgDurationMs": 567179.3292249003,
-      "avgTokens": 4929.4,
-      "totalTokens": 49294,
-      "avgCost": 0.8292816000000001,
-      "totalCost": 8.292816
+      "avgDurationMs": 1484487.4049250002,
+      "avgTokens": 7694.1,
+      "totalTokens": 76941,
+      "avgCost": 1.297128,
+      "totalCost": 12.97128
     },
     {
       "model": "gpt-5.2-xhigh",
@@ -1632,16 +1632,16 @@
     {
       "model": "gpt-5.2-xhigh",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:11:00.698Z",
-      "accuracy": 10,
-      "correct": 1,
-      "failed": 9,
+      "timestamp": "2025-12-30T23:48:04.580Z",
+      "accuracy": 20,
+      "correct": 2,
+      "failed": 6,
       "total": 10,
-      "avgDurationMs": 334943.0743874998,
-      "avgTokens": 4310.1,
-      "totalTokens": 43101,
-      "avgCost": 0.06043659999999999,
-      "totalCost": 0.604366
+      "avgDurationMs": 1637272.3368207996,
+      "avgTokens": 9962.6,
+      "totalTokens": 99626,
+      "avgCost": 0.139853,
+      "totalCost": 1.39853
     },
     {
       "model": "gpt-oss-120b",
@@ -1716,12 +1716,12 @@
     {
       "model": "grok-4",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:30:10.549Z",
+      "timestamp": "2025-12-30T21:00:01.366Z",
       "accuracy": 0,
       "correct": 0,
       "failed": 5,
       "total": 10,
-      "avgDurationMs": 990354.6876126999,
+      "avgDurationMs": 1169424.8535835,
       "avgTokens": 13722.7,
       "totalTokens": 137227,
       "avgCost": 0.20701394999999997,
@@ -2052,14 +2052,14 @@
     {
       "model": "olmo-3.1-32b-think",
       "size": "15x15",
-      "timestamp": "2025-12-30T20:39:28.466Z",
+      "timestamp": "2025-12-30T21:34:57.696Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 4,
-      "total": 7,
-      "avgDurationMs": 1052179.4448274283,
-      "avgTokens": 10543.857142857143,
-      "totalTokens": 73807,
+      "failed": 5,
+      "total": 10,
+      "avgDurationMs": 1069440.1253625,
+      "avgTokens": 12444.5,
+      "totalTokens": 124445,
       "avgCost": 0,
       "totalCost": 0
     },
