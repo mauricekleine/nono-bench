@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-31T07:30:17.769Z",
+  "timestamp": "2025-12-31T08:14:42.921Z",
   "summary": {
     "models": [
       "gpt-5.2-pro-high",
@@ -35,9 +35,9 @@
   "byModel": [
     {
       "model": "gpt-5.2-pro-high",
-      "overallAccuracy": 66.66666666666666,
-      "overallCorrect": 20,
-      "overallFailed": 7,
+      "overallAccuracy": 70,
+      "overallCorrect": 21,
+      "overallFailed": 6,
       "overallTotal": 30,
       "bySize": [
         {
@@ -55,16 +55,16 @@
         },
         {
           "size": "10x10",
-          "timestamp": "2025-12-30T18:37:57.261Z",
-          "accuracy": 70,
-          "correct": 7,
-          "failed": 1,
+          "timestamp": "2025-12-31T08:12:21.367Z",
+          "accuracy": 80,
+          "correct": 8,
+          "failed": 0,
           "total": 10,
-          "avgDurationMs": 1465817.0125916,
-          "avgTokens": 23832.3,
-          "totalTokens": 238323,
-          "avgCost": 4.0126254,
-          "totalCost": 40.126254
+          "avgDurationMs": 1450363.2107874001,
+          "avgTokens": 30022.7,
+          "totalTokens": 300227,
+          "avgCost": 5.053608,
+          "totalCost": 50.53608
         },
         {
           "size": "15x15",
@@ -199,12 +199,12 @@
         },
         {
           "size": "10x10",
-          "timestamp": "2025-12-30T19:25:52.700Z",
+          "timestamp": "2025-12-31T08:02:02.721Z",
           "accuracy": 60,
           "correct": 6,
           "failed": 2,
           "total": 10,
-          "avgDurationMs": 1064744.9427542002,
+          "avgDurationMs": 906518.5118958002,
           "avgTokens": 24937.1,
           "totalTokens": 249371,
           "avgCost": 0.3497683,
@@ -229,7 +229,7 @@
       "model": "claude-4.5-opus-thinking-high",
       "overallAccuracy": 53.333333333333336,
       "overallCorrect": 16,
-      "overallFailed": 2,
+      "overallFailed": 1,
       "overallTotal": 30,
       "bySize": [
         {
@@ -247,12 +247,12 @@
         },
         {
           "size": "10x10",
-          "timestamp": "2025-12-30T18:22:36.676Z",
+          "timestamp": "2025-12-31T07:59:48.786Z",
           "accuracy": 40,
           "correct": 4,
           "failed": 1,
           "total": 10,
-          "avgDurationMs": 657037.3249625,
+          "avgDurationMs": 655422.7921041001,
           "avgTokens": 39771.9,
           "totalTokens": 397719,
           "avgCost": 0.9972925,
@@ -260,16 +260,16 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T18:59:36.440Z",
+          "timestamp": "2025-12-31T08:12:21.634Z",
           "accuracy": 30,
           "correct": 3,
-          "failed": 1,
+          "failed": 0,
           "total": 10,
-          "avgDurationMs": 646279.4004164995,
-          "avgTokens": 34092.1,
-          "totalTokens": 340921,
-          "avgCost": 0.8557764999999999,
-          "totalCost": 8.557765
+          "avgDurationMs": 629309.4009164994,
+          "avgTokens": 39197.6,
+          "totalTokens": 391976,
+          "avgCost": 0.983812,
+          "totalCost": 9.83812
         }
       ]
     },
@@ -308,12 +308,12 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T22:23:00.933Z",
+          "timestamp": "2025-12-31T08:03:54.750Z",
           "accuracy": 10,
           "correct": 1,
           "failed": 7,
           "total": 10,
-          "avgDurationMs": 1525255.5536126,
+          "avgDurationMs": 1348840.4279085,
           "avgTokens": 5080.9,
           "totalTokens": 50809,
           "avgCost": 0.07141225,
@@ -469,7 +469,7 @@
       "model": "grok-4.1-fast",
       "overallAccuracy": 20,
       "overallCorrect": 6,
-      "overallFailed": 1,
+      "overallFailed": 0,
       "overallTotal": 30,
       "bySize": [
         {
@@ -500,16 +500,16 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T18:10:48.817Z",
+          "timestamp": "2025-12-31T07:57:00.972Z",
           "accuracy": 0,
           "correct": 0,
-          "failed": 1,
+          "failed": 0,
           "total": 10,
-          "avgDurationMs": 368601.7514501001,
-          "avgTokens": 32600.8,
-          "totalTokens": 326008,
-          "avgCost": 0.016420585,
-          "totalCost": 0.16420585000000001
+          "avgDurationMs": 343666.6334251001,
+          "avgTokens": 41572.2,
+          "totalTokens": 415722,
+          "avgCost": 0.02091963,
+          "totalCost": 0.2091963
         }
       ]
     },
@@ -535,12 +535,12 @@
         },
         {
           "size": "10x10",
-          "timestamp": "2025-12-30T19:14:00.652Z",
+          "timestamp": "2025-12-31T08:11:19.465Z",
           "accuracy": 10,
           "correct": 1,
           "failed": 3,
           "total": 10,
-          "avgDurationMs": 549550.8160041,
+          "avgDurationMs": 663180.8098291,
           "avgTokens": 12636.7,
           "totalTokens": 126367,
           "avgCost": 0.025611440000000003,
@@ -565,7 +565,7 @@
       "model": "minimax-m2.1",
       "overallAccuracy": 16.666666666666664,
       "overallCorrect": 5,
-      "overallFailed": 7,
+      "overallFailed": 6,
       "overallTotal": 30,
       "bySize": [
         {
@@ -596,16 +596,16 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T19:17:36.720Z",
+          "timestamp": "2025-12-31T08:10:00.723Z",
           "accuracy": 0,
           "correct": 0,
-          "failed": 7,
+          "failed": 6,
           "total": 10,
-          "avgDurationMs": 496941.2931333,
-          "avgTokens": 5710.1,
-          "totalTokens": 57101,
-          "avgCost": 0.006903000000000001,
-          "totalCost": 0.06903000000000001
+          "avgDurationMs": 409237.80508350005,
+          "avgTokens": 7778.6,
+          "totalTokens": 77786,
+          "avgCost": 0.00940434,
+          "totalCost": 0.0940434
         }
       ]
     },
@@ -692,12 +692,12 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T21:34:57.696Z",
+          "timestamp": "2025-12-31T08:09:48.760Z",
           "accuracy": 0,
           "correct": 0,
           "failed": 5,
           "total": 10,
-          "avgDurationMs": 1069440.1253625,
+          "avgDurationMs": 1008705.4349957,
           "avgTokens": 12444.5,
           "totalTokens": 124445,
           "avgCost": 0,
@@ -740,12 +740,12 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T18:00:20.769Z",
+          "timestamp": "2025-12-31T07:51:02.350Z",
           "accuracy": 0,
           "correct": 0,
           "failed": 1,
           "total": 10,
-          "avgDurationMs": 117761.98327069986,
+          "avgDurationMs": 123290.53320819986,
           "avgTokens": 9364.7,
           "totalTokens": 93647,
           "avgCost": 0.0028638075,
@@ -949,21 +949,21 @@
       "model": "kimi-k2",
       "overallAccuracy": 0,
       "overallCorrect": 0,
-      "overallFailed": 1,
+      "overallFailed": 0,
       "overallTotal": 30,
       "bySize": [
         {
           "size": "5x5",
-          "timestamp": "2025-12-30T17:54:37.241Z",
+          "timestamp": "2025-12-31T07:44:56.610Z",
           "accuracy": 0,
           "correct": 0,
-          "failed": 1,
+          "failed": 0,
           "total": 10,
-          "avgDurationMs": 1975.0654669000003,
-          "avgTokens": 12.3,
-          "totalTokens": 123,
-          "avgCost": 0.00018478800000000002,
-          "totalCost": 0.00184788
+          "avgDurationMs": 1759.9280711000004,
+          "avgTokens": 14,
+          "totalTokens": 140,
+          "avgCost": 0.000208598,
+          "totalCost": 0.00208598
         },
         {
           "size": "10x10",
@@ -997,7 +997,7 @@
       "model": "mimo-v2-flash",
       "overallAccuracy": 0,
       "overallCorrect": 0,
-      "overallFailed": 5,
+      "overallFailed": 3,
       "overallTotal": 30,
       "bySize": [
         {
@@ -1028,14 +1028,14 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T18:31:24.626Z",
+          "timestamp": "2025-12-31T08:04:52.005Z",
           "accuracy": 0,
           "correct": 0,
-          "failed": 5,
+          "failed": 3,
           "total": 10,
-          "avgDurationMs": 222396.63988340003,
-          "avgTokens": 131.8,
-          "totalTokens": 1318,
+          "avgDurationMs": 121364.62064169999,
+          "avgTokens": 189.7,
+          "totalTokens": 1897,
           "avgCost": 0,
           "totalCost": 0
         }
@@ -1045,7 +1045,7 @@
       "model": "ministral-14b-2512",
       "overallAccuracy": 0,
       "overallCorrect": 0,
-      "overallFailed": 15,
+      "overallFailed": 14,
       "overallTotal": 30,
       "bySize": [
         {
@@ -1063,25 +1063,25 @@
         },
         {
           "size": "10x10",
-          "timestamp": "2025-12-30T17:54:42.409Z",
+          "timestamp": "2025-12-31T07:58:21.390Z",
           "accuracy": 0,
           "correct": 0,
-          "failed": 5,
+          "failed": 4,
           "total": 10,
-          "avgDurationMs": 1990.881529300036,
-          "avgTokens": 65.7,
-          "totalTokens": 657,
-          "avgCost": 0.000058819999999999996,
-          "totalCost": 0.0005882
+          "avgDurationMs": 81736.81276680004,
+          "avgTokens": 92.3,
+          "totalTokens": 923,
+          "avgCost": 0.00007334,
+          "totalCost": 0.0007333999999999999
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-30T17:55:00.597Z",
+          "timestamp": "2025-12-31T07:59:17.918Z",
           "accuracy": 0,
           "correct": 0,
           "failed": 10,
           "total": 10,
-          "avgDurationMs": 1816.2984332,
+          "avgDurationMs": 5650.2058208000035,
           "avgTokens": 0,
           "totalTokens": 0,
           "avgCost": 0,
@@ -1198,12 +1198,12 @@
     {
       "model": "claude-4.5-opus-thinking-high",
       "size": "10x10",
-      "timestamp": "2025-12-30T18:22:36.676Z",
+      "timestamp": "2025-12-31T07:59:48.786Z",
       "accuracy": 40,
       "correct": 4,
       "failed": 1,
       "total": 10,
-      "avgDurationMs": 657037.3249625,
+      "avgDurationMs": 655422.7921041001,
       "avgTokens": 39771.9,
       "totalTokens": 397719,
       "avgCost": 0.9972925,
@@ -1212,16 +1212,16 @@
     {
       "model": "claude-4.5-opus-thinking-high",
       "size": "15x15",
-      "timestamp": "2025-12-30T18:59:36.440Z",
+      "timestamp": "2025-12-31T08:12:21.634Z",
       "accuracy": 30,
       "correct": 3,
-      "failed": 1,
+      "failed": 0,
       "total": 10,
-      "avgDurationMs": 646279.4004164995,
-      "avgTokens": 34092.1,
-      "totalTokens": 340921,
-      "avgCost": 0.8557764999999999,
-      "totalCost": 8.557765
+      "avgDurationMs": 629309.4009164994,
+      "avgTokens": 39197.6,
+      "totalTokens": 391976,
+      "avgCost": 0.983812,
+      "totalCost": 9.83812
     },
     {
       "model": "claude-4.5-sonnet",
@@ -1506,12 +1506,12 @@
     {
       "model": "gpt-5.2-high",
       "size": "15x15",
-      "timestamp": "2025-12-30T22:23:00.933Z",
+      "timestamp": "2025-12-31T08:03:54.750Z",
       "accuracy": 10,
       "correct": 1,
       "failed": 7,
       "total": 10,
-      "avgDurationMs": 1525255.5536126,
+      "avgDurationMs": 1348840.4279085,
       "avgTokens": 5080.9,
       "totalTokens": 50809,
       "avgCost": 0.07141225,
@@ -1576,16 +1576,16 @@
     {
       "model": "gpt-5.2-pro-high",
       "size": "10x10",
-      "timestamp": "2025-12-30T18:37:57.261Z",
-      "accuracy": 70,
-      "correct": 7,
-      "failed": 1,
+      "timestamp": "2025-12-31T08:12:21.367Z",
+      "accuracy": 80,
+      "correct": 8,
+      "failed": 0,
       "total": 10,
-      "avgDurationMs": 1465817.0125916,
-      "avgTokens": 23832.3,
-      "totalTokens": 238323,
-      "avgCost": 4.0126254,
-      "totalCost": 40.126254
+      "avgDurationMs": 1450363.2107874001,
+      "avgTokens": 30022.7,
+      "totalTokens": 300227,
+      "avgCost": 5.053608,
+      "totalCost": 50.53608
     },
     {
       "model": "gpt-5.2-pro-high",
@@ -1618,12 +1618,12 @@
     {
       "model": "gpt-5.2-xhigh",
       "size": "10x10",
-      "timestamp": "2025-12-30T19:25:52.700Z",
+      "timestamp": "2025-12-31T08:02:02.721Z",
       "accuracy": 60,
       "correct": 6,
       "failed": 2,
       "total": 10,
-      "avgDurationMs": 1064744.9427542002,
+      "avgDurationMs": 906518.5118958002,
       "avgTokens": 24937.1,
       "totalTokens": 249371,
       "avgCost": 0.3497683,
@@ -1758,30 +1758,30 @@
     {
       "model": "grok-4.1-fast",
       "size": "15x15",
-      "timestamp": "2025-12-30T18:10:48.817Z",
+      "timestamp": "2025-12-31T07:57:00.972Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 1,
+      "failed": 0,
       "total": 10,
-      "avgDurationMs": 368601.7514501001,
-      "avgTokens": 32600.8,
-      "totalTokens": 326008,
-      "avgCost": 0.016420585,
-      "totalCost": 0.16420585000000001
+      "avgDurationMs": 343666.6334251001,
+      "avgTokens": 41572.2,
+      "totalTokens": 415722,
+      "avgCost": 0.02091963,
+      "totalCost": 0.2091963
     },
     {
       "model": "kimi-k2",
       "size": "5x5",
-      "timestamp": "2025-12-30T17:54:37.241Z",
+      "timestamp": "2025-12-31T07:44:56.610Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 1,
+      "failed": 0,
       "total": 10,
-      "avgDurationMs": 1975.0654669000003,
-      "avgTokens": 12.3,
-      "totalTokens": 123,
-      "avgCost": 0.00018478800000000002,
-      "totalCost": 0.00184788
+      "avgDurationMs": 1759.9280711000004,
+      "avgTokens": 14,
+      "totalTokens": 140,
+      "avgCost": 0.000208598,
+      "totalCost": 0.00208598
     },
     {
       "model": "kimi-k2",
@@ -1828,12 +1828,12 @@
     {
       "model": "kimi-k2-thinking",
       "size": "10x10",
-      "timestamp": "2025-12-30T19:14:00.652Z",
+      "timestamp": "2025-12-31T08:11:19.465Z",
       "accuracy": 10,
       "correct": 1,
       "failed": 3,
       "total": 10,
-      "avgDurationMs": 549550.8160041,
+      "avgDurationMs": 663180.8098291,
       "avgTokens": 12636.7,
       "totalTokens": 126367,
       "avgCost": 0.025611440000000003,
@@ -1884,14 +1884,14 @@
     {
       "model": "mimo-v2-flash",
       "size": "15x15",
-      "timestamp": "2025-12-30T18:31:24.626Z",
+      "timestamp": "2025-12-31T08:04:52.005Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 5,
+      "failed": 3,
       "total": 10,
-      "avgDurationMs": 222396.63988340003,
-      "avgTokens": 131.8,
-      "totalTokens": 1318,
+      "avgDurationMs": 121364.62064169999,
+      "avgTokens": 189.7,
+      "totalTokens": 1897,
       "avgCost": 0,
       "totalCost": 0
     },
@@ -1926,16 +1926,16 @@
     {
       "model": "minimax-m2.1",
       "size": "15x15",
-      "timestamp": "2025-12-30T19:17:36.720Z",
+      "timestamp": "2025-12-31T08:10:00.723Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 7,
+      "failed": 6,
       "total": 10,
-      "avgDurationMs": 496941.2931333,
-      "avgTokens": 5710.1,
-      "totalTokens": 57101,
-      "avgCost": 0.006903000000000001,
-      "totalCost": 0.06903000000000001
+      "avgDurationMs": 409237.80508350005,
+      "avgTokens": 7778.6,
+      "totalTokens": 77786,
+      "avgCost": 0.00940434,
+      "totalCost": 0.0940434
     },
     {
       "model": "ministral-14b-2512",
@@ -1954,26 +1954,26 @@
     {
       "model": "ministral-14b-2512",
       "size": "10x10",
-      "timestamp": "2025-12-30T17:54:42.409Z",
+      "timestamp": "2025-12-31T07:58:21.390Z",
       "accuracy": 0,
       "correct": 0,
-      "failed": 5,
+      "failed": 4,
       "total": 10,
-      "avgDurationMs": 1990.881529300036,
-      "avgTokens": 65.7,
-      "totalTokens": 657,
-      "avgCost": 0.000058819999999999996,
-      "totalCost": 0.0005882
+      "avgDurationMs": 81736.81276680004,
+      "avgTokens": 92.3,
+      "totalTokens": 923,
+      "avgCost": 0.00007334,
+      "totalCost": 0.0007333999999999999
     },
     {
       "model": "ministral-14b-2512",
       "size": "15x15",
-      "timestamp": "2025-12-30T17:55:00.597Z",
+      "timestamp": "2025-12-31T07:59:17.918Z",
       "accuracy": 0,
       "correct": 0,
       "failed": 10,
       "total": 10,
-      "avgDurationMs": 1816.2984332,
+      "avgDurationMs": 5650.2058208000035,
       "avgTokens": 0,
       "totalTokens": 0,
       "avgCost": 0,
@@ -2052,12 +2052,12 @@
     {
       "model": "olmo-3.1-32b-think",
       "size": "15x15",
-      "timestamp": "2025-12-30T21:34:57.696Z",
+      "timestamp": "2025-12-31T08:09:48.760Z",
       "accuracy": 0,
       "correct": 0,
       "failed": 5,
       "total": 10,
-      "avgDurationMs": 1069440.1253625,
+      "avgDurationMs": 1008705.4349957,
       "avgTokens": 12444.5,
       "totalTokens": 124445,
       "avgCost": 0,
@@ -2094,16 +2094,156 @@
     {
       "model": "seed-1.6-flash",
       "size": "15x15",
-      "timestamp": "2025-12-30T18:00:20.769Z",
+      "timestamp": "2025-12-31T07:51:02.350Z",
       "accuracy": 0,
       "correct": 0,
       "failed": 1,
       "total": 10,
-      "avgDurationMs": 117761.98327069986,
+      "avgDurationMs": 123290.53320819986,
       "avgTokens": 9364.7,
       "totalTokens": 93647,
       "avgCost": 0.0028638075,
       "totalCost": 0.028638075
+    }
+  ],
+  "errorsByModel": [
+    {
+      "model": "ministral-14b-2512",
+      "totalErrors": 14,
+      "errors": [
+        {
+          "message": "No object generated: could not parse the response.",
+          "count": 13
+        },
+        {
+          "message": "No output generated.",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2-xhigh",
+      "totalErrors": 8,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "model": "kimi-k2-thinking",
+      "totalErrors": 8,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 5
+        },
+        {
+          "message": "No object generated: could not parse the response.",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2-high",
+      "totalErrors": 7,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2-pro",
+      "totalErrors": 6,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2-pro-high",
+      "totalErrors": 6,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "model": "minimax-m2.1",
+      "totalErrors": 6,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "model": "grok-4",
+      "totalErrors": 5,
+      "errors": [
+        {
+          "message": "Network connection lost.",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "model": "olmo-3.1-32b-think",
+      "totalErrors": 5,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "model": "mimo-v2-flash",
+      "totalErrors": 3,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.2",
+      "totalErrors": 2,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "model": "claude-4.5-opus-thinking-high",
+      "totalErrors": 1,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "model": "seed-1.6-flash",
+      "totalErrors": 1,
+      "errors": [
+        {
+          "message": "No output generated.",
+          "count": 1
+        }
+      ]
     }
   ]
 }

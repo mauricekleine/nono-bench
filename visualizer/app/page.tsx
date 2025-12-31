@@ -80,6 +80,17 @@ type ModelData = {
 	bySize: SizeData[];
 };
 
+type ErrorMessageData = {
+	message: string;
+	count: number;
+};
+
+type ModelErrorData = {
+	model: string;
+	totalErrors: number;
+	errors: ErrorMessageData[];
+};
+
 type SortColumn = "accuracy" | "totalCost" | "avgCost" | "totalTime" | "avgTime";
 type SortDirection = "asc" | "desc";
 
@@ -91,6 +102,7 @@ type Results = {
 	};
 	byModel: ModelData[];
 	chartData: (SizeData & { model: string })[];
+	errorsByModel?: ModelErrorData[];
 };
 
 const results = resultsData as Results;
@@ -181,6 +193,7 @@ function getModelStats(modelData: ModelData) {
 export default function Page() {
 	const [selectedSize, setSelectedSize] = useState<string>("all");
 	const [aboutOpen, setAboutOpen] = useState(false);
+	const [errorsOpen, setErrorsOpen] = useState(false);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("accuracy");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -763,6 +776,49 @@ export default function Page() {
 							</table>
 						</div>
 					</div>
+
+					{/* Error Messages Collapsible */}
+					{results.errorsByModel && results.errorsByModel.length > 0 && (
+						<Collapsible open={errorsOpen} onOpenChange={setErrorsOpen} className="mt-4">
+							<CollapsibleTrigger className="flex items-center gap-2 px-4 py-2.5 w-full text-sm text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/50 border border-border rounded-lg transition-all cursor-pointer">
+								<Warning className="size-4 text-amber-500" weight="bold" />
+								<span className="font-medium">
+									Error Messages ({results.errorsByModel.reduce((sum, m) => sum + m.totalErrors, 0)} total across {results.errorsByModel.length} models)
+								</span>
+								<CaretDown
+									className={`size-4 ml-auto transition-transform ${errorsOpen ? "rotate-180" : ""}`}
+								/>
+							</CollapsibleTrigger>
+							<CollapsibleContent>
+								<div className="mt-3 space-y-4">
+									{results.errorsByModel.map((modelErrors) => (
+										<div key={modelErrors.model} className="p-4 rounded-lg bg-muted/20 border border-border">
+											<div className="flex items-center justify-between mb-3">
+												<span className="font-medium text-foreground">
+													{formatModelName(modelErrors.model)}
+												</span>
+												<span className="text-xs font-mono text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">
+													{modelErrors.totalErrors} {modelErrors.totalErrors === 1 ? "error" : "errors"}
+												</span>
+											</div>
+											<div className="space-y-2">
+												{modelErrors.errors.map((error, idx) => (
+													<div key={idx} className="flex items-start gap-3 text-sm">
+														<span className="shrink-0 font-mono text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+															×{error.count}
+														</span>
+														<code className="text-xs text-muted-foreground font-mono break-all bg-background/50 px-2 py-1 rounded border border-border/50">
+															{error.message}
+														</code>
+													</div>
+												))}
+											</div>
+										</div>
+									))}
+								</div>
+							</CollapsibleContent>
+						</Collapsible>
+					)}
 				</section>
 
 				{/* Per-Size Stats */}
