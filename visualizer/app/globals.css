@@ -125,6 +125,24 @@
   }
 }
 
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: oklch(0.16 0.02 270);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0.02 270);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.45 0.02 270);
+}
+
 /* Grid pattern background for Nonogram theme */
 .grid-pattern {
   background-image: radial-gradient(

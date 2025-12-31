@@ -64,7 +64,9 @@ type SizeData = {
 	correct: number;
 	failed: number;
 	total: number;
+	runs?: number; // Added: successful runs (excluding failed)
 	avgDurationMs: number;
+	totalDurationMs?: number; // Added: total duration for successful runs
 	avgTokens: number;
 	totalTokens: number;
 	avgCost: number;
@@ -77,6 +79,7 @@ type ModelData = {
 	overallCorrect: number;
 	overallFailed: number;
 	overallTotal: number;
+	overallRuns?: number; // Added: total successful runs (excluding failed)
 	bySize: SizeData[];
 };
 
@@ -147,47 +150,61 @@ function formatCost(cost: number): string {
 	return `$${cost.toFixed(2)}`;
 }
 
-// Helper to get accuracy for a specific size (excluding failed tests)
-function getAccuracyForSize(modelData: ModelData, size: string): number {
-	const sizeData = modelData.bySize.find((s) => s.size === size);
-	if (!sizeData) return 0;
-	const runs = sizeData.total - sizeData.failed;
-	return runs > 0 ? (sizeData.correct / runs) * 100 : 0;
+// Helper to get runs for a size (uses new field or calculates from total - failed)
+function getSizeRuns(sizeData: SizeData): number {
+	return sizeData.runs ?? (sizeData.total - sizeData.failed);
 }
 
-// Helper to get stats for a specific size (excluding failed tests)
+// Helper to get total duration for a size (uses new field or estimates from avg * runs)
+function getSizeTotalDuration(sizeData: SizeData): number {
+	if (sizeData.totalDurationMs !== undefined) return sizeData.totalDurationMs;
+	const runs = getSizeRuns(sizeData);
+	return sizeData.avgDurationMs * runs;
+}
+
+// Helper to get overall runs (uses new field or calculates from total - failed)
+function getModelRuns(modelData: ModelData): number {
+	return modelData.overallRuns ?? (modelData.overallTotal - modelData.overallFailed);
+}
+
+// Helper to get accuracy for a specific size
+function getAccuracyForSize(modelData: ModelData, size: string): number {
+	const sizeData = modelData.bySize.find((s) => s.size === size);
+	return sizeData?.accuracy ?? 0;
+}
+
+// Helper to get stats for a specific size
 function getSizeStats(modelData: ModelData, size: string) {
 	const sizeData = modelData.bySize.find((s) => s.size === size);
 	if (!sizeData) return { accuracy: 0, correct: 0, runs: 0, failed: 0, avgCost: 0, avgTime: 0 };
-	const runs = sizeData.total - sizeData.failed;
-	const correct = sizeData.correct;
-	const failed = sizeData.failed;
-	const accuracy = runs > 0 ? (correct / runs) * 100 : 0;
-	const avgCost = runs > 0 ? sizeData.totalCost / runs : 0;
-	const avgTime = runs > 0 ? sizeData.avgDurationMs : 0;
-	return { accuracy, correct, runs, failed, avgCost, avgTime };
+	return {
+		accuracy: sizeData.accuracy,
+		correct: sizeData.correct,
+		runs: getSizeRuns(sizeData),
+		failed: sizeData.failed,
+		avgCost: sizeData.avgCost,
+		avgTime: sizeData.avgDurationMs,
+	};
 }
 
-// Helper to get model stats (excluding failed tests from averages)
+// Helper to get model stats
 function getModelStats(modelData: ModelData) {
-	const totalDuration = modelData.bySize.reduce(
-		(sum, s) => sum + s.avgDurationMs * s.total,
-		0,
-	);
-	const totalPuzzles = modelData.overallTotal;
-	const totalFailed = modelData.overallFailed;
-	const runs = totalPuzzles - totalFailed; // Successful runs only
-	const correct = modelData.overallCorrect;
-
-	// Calculate averages based on successful runs only
-	const avgDuration = runs > 0 ? totalDuration / runs : 0;
+	const totalDuration = modelData.bySize.reduce((sum, s) => sum + getSizeTotalDuration(s), 0);
 	const totalCost = modelData.bySize.reduce((sum, s) => sum + s.totalCost, 0);
+	const runs = getModelRuns(modelData);
+	const avgDuration = runs > 0 ? totalDuration / runs : 0;
 	const avgCost = runs > 0 ? totalCost / runs : 0;
 
-	// Recalculate accuracy excluding failed tests
-	const accuracy = runs > 0 ? (correct / runs) * 100 : 0;
-
-	return { avgDuration, totalDuration, totalCost, avgCost, totalFailed, runs, correct, accuracy };
+	return {
+		avgDuration,
+		totalDuration,
+		totalCost,
+		avgCost,
+		totalFailed: modelData.overallFailed,
+		runs,
+		correct: modelData.overallCorrect,
+		accuracy: modelData.overallAccuracy,
+	};
 }
 
 export default function Page() {
@@ -227,21 +244,13 @@ export default function Page() {
 	const chartData = useMemo(() => {
 		const getChartModelStats = (model: ModelData) => {
 			if (selectedSize === "all") {
-				const totalDuration = model.bySize.reduce(
-					(sum, s) => sum + s.avgDurationMs * s.total,
-					0,
-				);
-				const totalCost = model.bySize.reduce(
-					(sum, s) => sum + s.totalCost,
-					0,
-				);
-				// Exclude failed tests from calculations
-				const runs = model.overallTotal - model.overallFailed;
-				const accuracy = runs > 0 ? (model.overallCorrect / runs) * 100 : 0;
+				const totalDuration = model.bySize.reduce((sum, s) => sum + getSizeTotalDuration(s), 0);
+				const totalCost = model.bySize.reduce((sum, s) => sum + s.totalCost, 0);
+				const runs = getModelRuns(model);
 				return {
 					model: model.model,
 					displayName: formatModelName(model.model),
-					accuracy,
+					accuracy: model.overallAccuracy,
 					correct: model.overallCorrect,
 					total: runs,
 					avgDuration: runs > 0 ? totalDuration / runs : 0,
@@ -261,16 +270,13 @@ export default function Page() {
 					totalCost: 0,
 				};
 			}
-			// Exclude failed tests from calculations
-			const runs = sizeData.total - sizeData.failed;
-			const accuracy = runs > 0 ? (sizeData.correct / runs) * 100 : 0;
 			return {
 				model: model.model,
 				displayName: formatModelName(model.model),
-				accuracy,
+				accuracy: sizeData.accuracy,
 				correct: sizeData.correct,
-				total: runs,
-				avgDuration: runs > 0 ? (sizeData.avgDurationMs * sizeData.total) / runs : 0,
+				total: getSizeRuns(sizeData),
+				avgDuration: sizeData.avgDurationMs,
 				totalCost: sizeData.totalCost,
 			};
 		};
@@ -342,7 +348,7 @@ export default function Page() {
 	const benchmarkStats = useMemo(() => {
 		const totalModels = results.summary.models.length;
 		const puzzlesPerModel = PUZZLES.length;
-		const totalRuns = results.byModel.reduce((sum, model) => sum + model.overallTotal - model.overallFailed, 0);
+		const totalRuns = results.byModel.reduce((sum, model) => sum + getModelRuns(model), 0);
 		return { totalModels, totalPuzzles: puzzlesPerModel, totalRuns };
 	}, []);
 
@@ -480,7 +486,7 @@ export default function Page() {
 
 				{/* Main Chart */}
 				<section className="mb-10">
-					<Card>
+					<Card className="pb-0">
 						<CardHeader>
 							<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 								<div>
@@ -513,68 +519,71 @@ export default function Page() {
 							</div>
 						</CardHeader>
 						<CardContent>
-							<ChartContainer
-								config={chartConfig}
-								className="h-[400px] w-full"
-							>
-								<BarChart
-									data={chartData}
-									margin={{ top: 30, right: 20, bottom: 60, left: 20 }}
+							<div className="overflow-x-auto -mx-6 px-6 pb-6">
+								<ChartContainer
+									config={chartConfig}
+									className="h-[400px]"
+									style={{ minWidth: `${Math.max(500, chartData.length * 52)}px` }}
 								>
-									<CartesianGrid
-										vertical={false}
-										strokeDasharray="3 3"
-										stroke="var(--border)"
-									/>
-									<XAxis
-										dataKey="displayName"
-										axisLine={false}
-										tickLine={false}
-										tick={{ fontSize: 11 }}
-										interval={0}
-										angle={-35}
-										textAnchor="end"
-										height={60}
-									/>
-									<YAxis
-										domain={[0, 100]}
-										tickFormatter={(v) => `${v}%`}
-										axisLine={false}
-										tickLine={false}
-										width={45}
-									/>
-									<ChartTooltip
-										content={
-											<ChartTooltipContent
-												hideLabel
-												hideIndicator
-												formatter={(value, name, props) => (
-													<div className="flex flex-col gap-0.5">
-														<span className="font-medium">
-															{props.payload.displayName}
-														</span>
-														<span className="text-muted-foreground">
-															{props.payload.correct}/{props.payload.total}{" "}
-															solved ({Number(value).toFixed(1)}%)
-														</span>
-													</div>
-												)}
-											/>
-										}
-									/>
-									<Bar dataKey="accuracy" radius={[4, 4, 0, 0]}>
-										{chartData.map((entry, index) => (
-											<Cell key={`cell-${index}`} fill={entry.fill} />
-										))}
-										<LabelList
-											dataKey="accuracy"
-											position="top"
-											formatter={(v: number) => `${v.toFixed(0)}%`}
-											className="fill-foreground font-mono text-xs font-semibold"
+									<BarChart
+										data={chartData}
+										margin={{ top: 30, right: 20, bottom: 60, left: 20 }}
+									>
+										<CartesianGrid
+											vertical={false}
+											strokeDasharray="3 3"
+											stroke="var(--border)"
 										/>
-									</Bar>
-								</BarChart>
-							</ChartContainer>
+										<XAxis
+											dataKey="displayName"
+											axisLine={false}
+											tickLine={false}
+											tick={{ fontSize: 11 }}
+											interval={0}
+											angle={-35}
+											textAnchor="end"
+											height={60}
+										/>
+										<YAxis
+											domain={[0, 100]}
+											tickFormatter={(v) => `${v}%`}
+											axisLine={false}
+											tickLine={false}
+											width={45}
+										/>
+										<ChartTooltip
+											content={
+												<ChartTooltipContent
+													hideLabel
+													hideIndicator
+													formatter={(value, name, props) => (
+														<div className="flex flex-col gap-0.5">
+															<span className="font-medium">
+																{props.payload.displayName}
+															</span>
+															<span className="text-muted-foreground">
+																{props.payload.correct}/{props.payload.total}{" "}
+																solved ({Number(value).toFixed(1)}%)
+															</span>
+														</div>
+													)}
+												/>
+											}
+										/>
+										<Bar dataKey="accuracy" radius={[4, 4, 0, 0]}>
+											{chartData.map((entry, index) => (
+												<Cell key={`cell-${index}`} fill={entry.fill} />
+											))}
+											<LabelList
+												dataKey="accuracy"
+												position="top"
+												formatter={(v: number) => `${v.toFixed(0)}%`}
+												className="fill-foreground font-mono text-xs font-semibold"
+											/>
+										</Bar>
+									</BarChart>
+								</ChartContainer>
+							</div>
 						</CardContent>
 					</Card>
 				</section>
@@ -846,16 +855,13 @@ export default function Page() {
 								(sum, s) => sum + s.correct,
 								0,
 							);
-							// Exclude failed tests from totals
 							const totalRuns = sizeStats.reduce(
-								(sum, s) => sum + s.total - s.failed,
+								(sum, s) => sum + getSizeRuns(s),
 								0,
 							);
-							// Calculate accuracy excluding failed tests
 							const avgAccuracy = totalRuns > 0 ? (totalCorrect / totalRuns) * 100 : 0;
-							// Calculate total duration and average excluding failed
 							const totalDuration = sizeStats.reduce(
-								(sum, s) => sum + s.avgDurationMs * s.total,
+								(sum, s) => sum + getSizeTotalDuration(s),
 								0,
 							);
 							const avgDuration = totalRuns > 0 ? totalDuration / totalRuns : 0;
@@ -863,6 +869,7 @@ export default function Page() {
 								(sum, s) => sum + s.totalCost,
 								0,
 							);
+							const avgCost = totalRuns > 0 ? totalCost / totalRuns : 0;
 
 							return (
 								<Card key={size}>
@@ -906,10 +913,10 @@ export default function Page() {
 											</div>
 											<div>
 												<p className="text-muted-foreground text-[10px] uppercase tracking-wide">
-													Total Cost
+													Avg Cost
 												</p>
 												<p className="font-mono text-sm">
-													{formatCost(totalCost)}
+													{formatCost(avgCost)}
 												</p>
 											</div>
 										</div>
