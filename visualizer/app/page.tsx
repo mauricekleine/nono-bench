@@ -496,6 +496,7 @@ export default function Page() {
 									<Select
 										value={selectedSize}
 										onValueChange={(value) => setSelectedSize(value ?? "all")}
+										modal={false}
 									>
 										<SelectTrigger className="w-28">
 											<SelectValue />
