@@ -26,7 +26,7 @@ export const MODELS: Model[] = [
   {
     llm: openrouter("anthropic/claude-opus-4.5", {
       ...defaultProviderOptions,
-      reasoning: { effort: "high" },
+      reasoning: { effort: "high", exclude: true },
     }),
     name: "claude-4.5-opus-thinking-high",
   },
@@ -41,10 +41,6 @@ export const MODELS: Model[] = [
 	{
 		llm: openrouter("deepseek/deepseek-v3.2", defaultProviderOptions),
 		name: "deepseek-v3.2",
-	},
-	{
-		llm: openrouter("deepseek/deepseek-v3.2-speciale", defaultProviderOptions),
-		name: "deepseek-v3.2-speciale",
 	},
 	{
 		llm: openrouter("google/gemini-3-flash-preview", defaultProviderOptions),
@@ -83,6 +79,7 @@ export const MODELS: Model[] = [
 			...defaultProviderOptions,
 			reasoning: {
 				effort: "high",
+				exclude: true,
 			},
 		}),
 		name: "gpt-5.2-high",
@@ -93,6 +90,7 @@ export const MODELS: Model[] = [
 			reasoning: {
         // @ts-expect-error - xhigh is valid but not typed
 				effort: "xhigh",
+				exclude: true,
 			},
 		}),
 		name: "gpt-5.2-xhigh",
@@ -107,6 +105,7 @@ export const MODELS: Model[] = [
 			...defaultProviderOptions,
 			reasoning: {
 				effort: "high",
+				exclude: true,
 			},
 		}),
 	},

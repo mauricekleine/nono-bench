@@ -11,7 +11,9 @@ type SizeData = {
 	correct: number;
 	failed: number;
 	total: number;
+	runs: number;
 	avgDurationMs: number;
+	totalDurationMs: number;
 	avgTokens: number;
 	totalTokens: number;
 	avgCost: number;
@@ -24,7 +26,19 @@ type ModelData = {
 	overallCorrect: number;
 	overallFailed: number;
 	overallTotal: number;
+	overallRuns: number;
 	bySize: SizeData[];
+};
+
+type ErrorMessageData = {
+	message: string;
+	count: number;
+};
+
+type ModelErrorData = {
+	model: string;
+	totalErrors: number;
+	errors: ErrorMessageData[];
 };
 
 type BenchmarkResults = {
@@ -35,6 +49,7 @@ type BenchmarkResults = {
 	};
 	byModel: ModelData[];
 	chartData: Array<{ model: string } & SizeData>;
+	errorsByModel: ModelErrorData[];
 };
 
 // Query type for aggregated stats
@@ -43,9 +58,11 @@ type AggregatedRow = {
 	size: string;
 	timestamp: string;
 	total: number;
+	runs: number;
 	correct: number;
 	failed: number;
 	avg_duration_ms: number;
+	total_duration_ms: number;
 	avg_tokens: number;
 	total_tokens: number;
 	avg_cost: number;
@@ -53,6 +70,7 @@ type AggregatedRow = {
 };
 
 // Aggregate stats from the runs table
+// All averages and totals EXCLUDE failed runs (status = 'failed')
 const aggregatedResults = db
 	.query<AggregatedRow, []>(
 		`
@@ -61,13 +79,15 @@ const aggregatedResults = db
       size,
       MAX(timestamp) as timestamp,
       COUNT(*) as total,
+      SUM(CASE WHEN status != 'failed' THEN 1 ELSE 0 END) as runs,
       SUM(correct) as correct,
       SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
-      AVG(duration_ms) as avg_duration_ms,
-      AVG(tokens) as avg_tokens,
-      SUM(tokens) as total_tokens,
-      AVG(cost) as avg_cost,
-      SUM(cost) as total_cost
+      AVG(CASE WHEN status != 'failed' THEN duration_ms ELSE NULL END) as avg_duration_ms,
+      SUM(CASE WHEN status != 'failed' THEN duration_ms ELSE 0 END) as total_duration_ms,
+      AVG(CASE WHEN status != 'failed' THEN tokens ELSE NULL END) as avg_tokens,
+      SUM(CASE WHEN status != 'failed' THEN tokens ELSE 0 END) as total_tokens,
+      AVG(CASE WHEN status != 'failed' THEN cost ELSE NULL END) as avg_cost,
+      SUM(CASE WHEN status != 'failed' THEN cost ELSE 0 END) as total_cost
     FROM runs
     GROUP BY model, size
     ORDER BY model, size
@@ -79,6 +99,51 @@ if (aggregatedResults.length === 0) {
 	console.log("No runs found in database. Nothing to export.");
 	process.exit(0);
 }
+
+// Query error messages grouped by model
+type ErrorRow = {
+	model: string;
+	error_message: string;
+	count: number;
+};
+
+const errorResults = db
+	.query<ErrorRow, []>(
+		`
+    SELECT 
+      model,
+      error_message,
+      COUNT(*) as count
+    FROM runs
+    WHERE error_message IS NOT NULL AND error_message != ''
+    GROUP BY model, error_message
+    ORDER BY model, count DESC
+  `,
+	)
+	.all();
+
+// Build errorsByModel structure
+const errorMap = new Map<string, ErrorMessageData[]>();
+for (const row of errorResults) {
+	if (!errorMap.has(row.model)) {
+		errorMap.set(row.model, []);
+	}
+	errorMap.get(row.model)!.push({
+		message: row.error_message,
+		count: row.count,
+	});
+}
+
+const errorsByModel: ModelErrorData[] = [];
+for (const [model, errors] of errorMap) {
+	errorsByModel.push({
+		model,
+		totalErrors: errors.reduce((sum, e) => sum + e.count, 0),
+		errors,
+	});
+}
+// Sort by total errors descending
+errorsByModel.sort((a, b) => b.totalErrors - a.totalErrors);
 
 // Sort sizes in order (5x5, 10x10, 15x15)
 function sortSizes(sizes: string[]): string[] {
@@ -98,17 +163,20 @@ for (const row of aggregatedResults) {
 		modelMap.set(row.model, []);
 	}
 
+	// Accuracy is calculated from runs (excluding failed), not total
 	const sizeData: SizeData = {
 		size: row.size,
 		timestamp: row.timestamp,
-		accuracy: row.total > 0 ? (row.correct / row.total) * 100 : 0,
+		accuracy: row.runs > 0 ? (row.correct / row.runs) * 100 : 0,
 		correct: row.correct,
 		failed: row.failed,
 		total: row.total,
-		avgDurationMs: row.avg_duration_ms,
-		avgTokens: row.avg_tokens,
+		runs: row.runs,
+		avgDurationMs: row.avg_duration_ms ?? 0,
+		totalDurationMs: row.total_duration_ms,
+		avgTokens: row.avg_tokens ?? 0,
 		totalTokens: row.total_tokens,
-		avgCost: row.avg_cost,
+		avgCost: row.avg_cost ?? 0,
 		totalCost: row.total_cost,
 	};
 
@@ -130,11 +198,13 @@ for (const [model, sizeDatas] of modelMap) {
 	let overallCorrect = 0;
 	let overallFailed = 0;
 	let overallTotal = 0;
+	let overallRuns = 0;
 
 	for (const sizeData of sortedSizeDatas) {
 		overallCorrect += sizeData.correct;
 		overallFailed += sizeData.failed;
 		overallTotal += sizeData.total;
+		overallRuns += sizeData.runs;
 
 		// Add to chartData
 		chartData.push({
@@ -143,12 +213,14 @@ for (const [model, sizeDatas] of modelMap) {
 		});
 	}
 
+	// Overall accuracy uses runs (excluding failed), not total
 	byModel.push({
 		model,
-		overallAccuracy: overallTotal > 0 ? (overallCorrect / overallTotal) * 100 : 0,
+		overallAccuracy: overallRuns > 0 ? (overallCorrect / overallRuns) * 100 : 0,
 		overallCorrect,
 		overallFailed,
 		overallTotal,
+		overallRuns,
 		bySize: sortedSizeDatas,
 	});
 }
@@ -165,6 +237,7 @@ const results: BenchmarkResults = {
 	},
 	byModel,
 	chartData,
+	errorsByModel,
 };
 
 // Write to file
@@ -182,4 +255,10 @@ for (const modelData of byModel) {
 	console.log(
 		`  ${modelData.model}: ${modelData.overallAccuracy.toFixed(2)}% (${modelData.overallCorrect}/${modelData.overallTotal})`,
 	);
+}
+
+// Show error stats
+if (errorsByModel.length > 0) {
+	const totalErrors = errorsByModel.reduce((sum, m) => sum + m.totalErrors, 0);
+	console.log(`\nError Messages: ${totalErrors} total across ${errorsByModel.length} models`);
 }

@@ -640,36 +640,18 @@ export default function Page() {
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Accuracy</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Runs</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Correct</th>
-										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">
-											<div className="flex items-center gap-1">
-												Failed
-												<Tooltip>
-													<TooltipTrigger
-														className="p-0.5 rounded hover:bg-muted"
-														onClick={(e) => e.stopPropagation()}
-													>
-														<Info className="size-3 text-muted-foreground" weight="bold" />
-													</TooltipTrigger>
-													<TooltipContent side="top" className="max-w-xs">
-														Failed requests due to invalid JSON, timeouts, rate limits, or other API errors.
-													</TooltipContent>
-												</Tooltip>
-											</div>
-										</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5">Avg Cost</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-blue-500/5 border-r border-border/50">Avg Time</th>
 										{/* 10×10 columns */}
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Accuracy</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Runs</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Correct</th>
-										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Failed</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5">Avg Cost</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-emerald-500/5 border-r border-border/50">Avg Time</th>
 										{/* 15×15 columns */}
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Accuracy</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Runs</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Correct</th>
-										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Failed</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Avg Cost</th>
 										<th className="text-left font-medium px-3 py-2 whitespace-nowrap bg-amber-500/5">Avg Time</th>
 									</tr>
@@ -731,11 +713,6 @@ export default function Page() {
 													<span className="font-mono text-muted-foreground text-xs">{stats5x5.correct}</span>
 												</td>
 												<td className="text-left px-3 py-3 bg-blue-500/5">
-													<span className={`font-mono text-xs ${stats5x5.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
-														{stats5x5.failed}
-													</span>
-												</td>
-												<td className="text-left px-3 py-3 bg-blue-500/5">
 													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats5x5.avgCost)}</span>
 												</td>
 												<td className="text-left px-3 py-3 bg-blue-500/5 border-r border-border/50">
@@ -750,11 +727,6 @@ export default function Page() {
 													<span className="font-mono text-muted-foreground text-xs">{stats10x10.correct}</span>
 												</td>
 												<td className="text-left px-3 py-3 bg-emerald-500/5">
-													<span className={`font-mono text-xs ${stats10x10.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
-														{stats10x10.failed}
-													</span>
-												</td>
-												<td className="text-left px-3 py-3 bg-emerald-500/5">
 													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats10x10.avgCost)}</span>
 												</td>
 												<td className="text-left px-3 py-3 bg-emerald-500/5 border-r border-border/50">
@@ -767,11 +739,6 @@ export default function Page() {
 												</td>
 												<td className="text-left px-3 py-3 bg-amber-500/5">
 													<span className="font-mono text-muted-foreground text-xs">{stats15x15.correct}</span>
-												</td>
-												<td className="text-left px-3 py-3 bg-amber-500/5">
-													<span className={`font-mono text-xs ${stats15x15.failed > 0 ? "text-amber-500" : "text-muted-foreground"}`}>
-														{stats15x15.failed}
-													</span>
 												</td>
 												<td className="text-left px-3 py-3 bg-amber-500/5">
 													<span className="font-mono text-muted-foreground text-xs">{formatCost(stats15x15.avgCost)}</span>
@@ -802,12 +769,13 @@ export default function Page() {
 							<CollapsibleContent>
 								<div className="mt-3 p-4 rounded-lg bg-muted/30 border border-border text-sm text-muted-foreground space-y-2">
 									<p>
-										Most errors occur when models exceed their maximum output token limit, particularly on larger grid sizes.
-										Increased puzzle complexity leads to excessive reasoning, and reasoning tokens bloat the total output context window—causing truncated or empty responses.
+										Each puzzle in the benchmark is intended to be run 10 times by every model, providing a consistent baseline for comparison. However, various errors can cause the actual number of successful runs to be less than 10 for some model–puzzle combinations.
 									</p>
 									<p>
-										Other errors stem from models failing to consistently produce valid JSON output.
-										Notably, smaller models like <span className="font-mono text-foreground">ministral-14b-2512</span> struggle more with larger grids, often failing to output a properly structured JSON object.
+										The most common errors occur when models exceed their maximum output token limit, especially with larger grid sizes. As puzzle complexity increases, models often produce lengthy reasoning, resulting in excessive tokens that can fill or overrun the available context window. This frequently leads to truncated or empty responses.
+									</p>
+									<p>
+										Additional failures stem from models not consistently returning valid JSON output. For example, smaller models like <span className="font-mono text-foreground">ministral-14b-2512</span> are particularly prone to struggle on larger grids, often failing to output a properly structured JSON object.
 									</p>
 								</div>
 								<div className="mt-4 space-y-4">
