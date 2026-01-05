@@ -18,7 +18,7 @@ nonobench/
 ```bash
 cd bench
 bun install
-bun run index.ts
+bun run bench.ts
 ```
 
 This will test configured LLM models against Nonogram puzzles and output results to `results.json`.
