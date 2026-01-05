@@ -26,34 +26,94 @@ export const MODELS: Model[] = [
   {
     llm: openrouter("anthropic/claude-opus-4.5", {
       ...defaultProviderOptions,
-      reasoning: { effort: "high", exclude: true },
+			extraBody:{
+				reasoning: { effort: "high", exclude: true },
+			}
     }),
-    name: "claude-4.5-opus-thinking-high",
+    name: "claude-4.5-opus-high",
   },
 	{
 		llm: openrouter("anthropic/claude-sonnet-4.5", defaultProviderOptions),
 		name: "claude-4.5-sonnet",
 	},
 	{
+		llm: openrouter("anthropic/claude-sonnet-4.5", {
+			...defaultProviderOptions,
+			extraBody:{
+				reasoning: { effort: "high", exclude: true },
+			}
+		}),
+		name: "claude-4.5-sonnet-high",
+	},
+	{
 		llm: openrouter("bytedance-seed/seed-1.6-flash", defaultProviderOptions),
 		name: "seed-1.6-flash",
+	},
+	{
+		llm: openrouter("bytedance-seed/seed-1.6-flash", {
+			...defaultProviderOptions,
+			extraBody:{
+				reasoning: { effort: "high", exclude: true },
+			}
+		}),
+		name: "seed-1.6-flash-high",
 	},
 	{
 		llm: openrouter("deepseek/deepseek-v3.2", defaultProviderOptions),
 		name: "deepseek-v3.2",
 	},
 	{
+		llm: openrouter("deepseek/deepseek-v3.2", {
+			...defaultProviderOptions,
+			extraBody:{
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "deepseek-v3.2-high",
+	},
+	{
 		llm: openrouter("google/gemini-3-flash-preview", defaultProviderOptions),
 		name: "gemini-3-flash-preview",
+	},
+	{
+		llm: openrouter("google/gemini-3-flash-preview", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "gemini-3-flash-preview-high",
 	},
 	{
 		llm: openrouter("google/gemini-3-pro-preview", defaultProviderOptions),
 		name: "gemini-3-pro-preview",
 	},
 	{
-		llm: openrouter("mistralai/ministral-14b-2512", defaultProviderOptions),
-		name: "ministral-14b-2512",
+		llm: openrouter("google/gemini-3-pro-preview", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "gemini-3-pro-preview-high",
 	},
+	{
+		llm: openrouter("minimax/minimax-m2.1", defaultProviderOptions),
+		name: "minimax-m2.1",
+	},
+	{
+		llm: openrouter("minimax/minimax-m2.1", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "minimax-m2.1-high",
+	},
+	// {
+	// 	llm: openrouter("mistralai/ministral-14b-2512", defaultProviderOptions),
+	// 	name: "ministral-14b-2512",
+	// },
 	{
 		llm: openrouter("mistralai/mistral-large-2512", defaultProviderOptions),
 		name: "mistral-large-2512",
@@ -67,19 +127,17 @@ export const MODELS: Model[] = [
 		name: "kimi-k2-thinking",
 	},
 	{
-		llm: openrouter("minimax/minimax-m2.1", defaultProviderOptions),
-		name: "minimax-m2.1",
-	},
-	{
 		llm: openrouter("openai/gpt-5.2", defaultProviderOptions),
 		name: "gpt-5.2",
 	},
 	{
 		llm: openrouter("openai/gpt-5.2", {
 			...defaultProviderOptions,
-			reasoning: {
-				effort: "high",
-				exclude: true,
+			extraBody: {
+				reasoning: {
+					effort: "high",
+					exclude: true,
+				},
 			},
 		}),
 		name: "gpt-5.2-high",
@@ -87,46 +145,92 @@ export const MODELS: Model[] = [
 	{
 		llm: openrouter("openai/gpt-5.2", {
 			...defaultProviderOptions,
-			reasoning: {
-        // @ts-expect-error - xhigh is valid but not typed
-				effort: "xhigh",
-				exclude: true,
+			extraBody: {
+				reasoning: {
+					effort: "xhigh",
+					exclude: true,
+				},
 			},
 		}),
 		name: "gpt-5.2-xhigh",
 	},
-	{
-		llm: openrouter("openai/gpt-5.2-pro", defaultProviderOptions),
-		name: "gpt-5.2-pro",
-	},
-	{
-		name: "gpt-5.2-pro-high",
-		llm: openrouter("openai/gpt-5.2-pro", {
-			...defaultProviderOptions,
-			reasoning: {
-				effort: "high",
-				exclude: true,
-			},
-		}),
-	},
+	// {
+	// 	llm: openrouter("openai/gpt-5.2-pro", defaultProviderOptions),
+	// 	name: "gpt-5.2-pro",
+	// },
+	// {
+	// 	name: "gpt-5.2-pro-high",
+	// 	llm: openrouter("openai/gpt-5.2-pro", {
+	// 		...defaultProviderOptions,
+	// 		reasoning: {
+	// 			effort: "high",
+	// 			exclude: true,
+	// 		},
+	// 	}),
+	// },
 	{
 		llm: openrouter("openai/gpt-oss-120b", defaultProviderOptions),
 		name: "gpt-oss-120b",
+	},
+	{
+		llm: openrouter("openai/gpt-oss-120b", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "gpt-oss-120b-high",
 	},
 	{
 		llm: openrouter("z-ai/glm-4.7", defaultProviderOptions),
 		name: "glm-4.7",
 	},
 	{
+		llm: openrouter("z-ai/glm-4.7", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "glm-4.7-high",
+	},
+	{
 		llm: openrouter("x-ai/grok-4", defaultProviderOptions),
 		name: "grok-4",
+	},
+	{
+		llm: openrouter("x-ai/grok-4", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "grok-4-high",
 	},
 	{
 		llm: openrouter("x-ai/grok-4.1-fast", defaultProviderOptions),
 		name: "grok-4.1-fast",
 	},
 	{
+		llm: openrouter("x-ai/grok-4.1-fast", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "grok-4.1-fast-high",
+	},
+	{
 		llm: openrouter("xiaomi/mimo-v2-flash:free", defaultProviderOptions),
 		name: "mimo-v2-flash",
+	},
+	{
+		llm: openrouter("xiaomi/mimo-v2-flash:free", {
+			...defaultProviderOptions,
+			extraBody: {
+				reasoning: { effort: "high", exclude: true },
+			},
+		}),
+		name: "mimo-v2-flash-high",
 	},
 ];
