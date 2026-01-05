@@ -1,7 +1,8 @@
 import { db } from "./db";
 
-// Output path
+// Output paths
 const resultsPath = new URL("../visualizer/app/results.json", import.meta.url).pathname;
+const resultsRawPath = new URL("../visualizer/app/results-raw.json", import.meta.url).pathname;
 
 // Types for the JSON output (matching existing format)
 type SizeData = {
@@ -67,6 +68,39 @@ type AggregatedRow = {
 	total_tokens: number;
 	avg_cost: number;
 	total_cost: number;
+};
+
+// Query type for raw results
+type RawRow = {
+	model: string;
+	puzzle_id: string;
+	size: string;
+	timestamp: string;
+	correct: number;
+	status: string;
+	duration_ms: number;
+	tokens: number;
+	cost: number;
+	error_message: string | null;
+};
+
+// Output type for raw results JSON
+type RawResult = {
+	model: string;
+	puzzleId: string;
+	size: string;
+	timestamp: string;
+	correct: boolean;
+	status: string;
+	durationMs: number;
+	tokens: number;
+	cost: number;
+	errorMessage: string | null;
+};
+
+type RawResults = {
+	timestamp: string;
+	runs: RawResult[];
 };
 
 // Aggregate stats from the runs table
@@ -262,3 +296,47 @@ if (errorsByModel.length > 0) {
 	const totalErrors = errorsByModel.reduce((sum, m) => sum + m.totalErrors, 0);
 	console.log(`\nError Messages: ${totalErrors} total across ${errorsByModel.length} models`);
 }
+
+// Query and export raw results
+const rawResults = db
+	.query<RawRow, []>(
+		`
+    SELECT
+      model,
+      puzzle_id,
+      size,
+      timestamp,
+      correct,
+      status,
+      duration_ms,
+      tokens,
+      cost,
+      error_message
+    FROM runs
+    ORDER BY model, size, timestamp
+  `,
+	)
+	.all();
+
+// Transform to camelCase output format
+const rawResultsOutput: RawResults = {
+	timestamp: new Date().toISOString(),
+	runs: rawResults.map((row) => ({
+		model: row.model,
+		puzzleId: row.puzzle_id,
+		size: row.size,
+		timestamp: row.timestamp,
+		correct: row.correct === 1,
+		status: row.status,
+		durationMs: row.duration_ms,
+		tokens: row.tokens,
+		cost: row.cost,
+		errorMessage: row.error_message,
+	})),
+};
+
+// Write raw results to file
+await Bun.write(resultsRawPath, JSON.stringify(rawResultsOutput, null, 2));
+
+console.log(`\nExported ${rawResults.length} raw runs to:`);
+console.log(`  ${resultsRawPath}`);

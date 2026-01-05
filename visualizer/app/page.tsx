@@ -43,6 +43,12 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -56,6 +62,7 @@ import {
 } from "@/components/ui/tooltip";
 
 import resultsData from "./results.json";
+import resultsRawData from "./results-raw.json";
 import { PUZZLES } from "@/components/puzzles";
 
 type SizeData = {
@@ -413,24 +420,45 @@ export default function Page() {
 								<span>Explore Puzzles</span>
 							</Link>
 
-							<button
-								type="button"
-								onClick={() => {
-									const blob = new Blob([JSON.stringify(results, null, 2)], {
-										type: "application/json",
-									});
-									const url = URL.createObjectURL(blob);
-									const a = document.createElement("a");
-									a.href = url;
-									a.download = "nonobench-results.json";
-									a.click();
-									URL.revokeObjectURL(url);
-								}}
-								className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all cursor-pointer whitespace-nowrap"
-							>
-								<DownloadSimple className="size-4" weight="bold" />
-								<span>Download Results</span>
-							</button>
+							<DropdownMenu>
+								<DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all cursor-pointer whitespace-nowrap">
+									<DownloadSimple className="size-4" weight="bold" />
+									<span>Download Results</span>
+									<CaretDown className="size-3" />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start">
+									<DropdownMenuItem
+										onClick={() => {
+											const blob = new Blob([JSON.stringify(results, null, 2)], {
+												type: "application/json",
+											});
+											const url = URL.createObjectURL(blob);
+											const a = document.createElement("a");
+											a.href = url;
+											a.download = "nonobench-results.json";
+											a.click();
+											URL.revokeObjectURL(url);
+										}}
+									>
+										Download Aggregated Results
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => {
+											const blob = new Blob([JSON.stringify(resultsRawData, null, 2)], {
+												type: "application/json",
+											});
+											const url = URL.createObjectURL(blob);
+											const a = document.createElement("a");
+											a.href = url;
+											a.download = "nonobench-results-raw.json";
+											a.click();
+											URL.revokeObjectURL(url);
+										}}
+									>
+										Download Raw Results
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 
 						<CollapsibleContent>

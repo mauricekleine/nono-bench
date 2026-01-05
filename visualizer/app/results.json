@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-31T09:02:34.746Z",
+  "timestamp": "2026-01-05T12:00:08.324Z",
   "summary": {
     "models": [
       "gpt-5.2-pro-high",
@@ -183,7 +183,7 @@
         },
         {
           "size": "15x15",
-          "timestamp": "2025-12-31T08:38:39.755Z",
+          "timestamp": "2025-12-31T09:08:40.478Z",
           "accuracy": 50,
           "correct": 2,
           "failed": 6,
@@ -1767,7 +1767,7 @@
     {
       "model": "gpt-5.2-pro",
       "size": "15x15",
-      "timestamp": "2025-12-31T08:38:39.755Z",
+      "timestamp": "2025-12-31T09:08:40.478Z",
       "accuracy": 50,
       "correct": 2,
       "failed": 6,
@@ -2467,8 +2467,12 @@
       "totalErrors": 6,
       "errors": [
         {
+          "message": "Insufficient credits. Add more using https://openrouter.ai/settings/credits",
+          "count": 4
+        },
+        {
           "message": "No output generated.",
-          "count": 6
+          "count": 2
         }
       ]
     },
