@@ -23,6 +23,7 @@ type SizeData = {
 
 type ModelData = {
 	model: string;
+	reasoning: boolean;
 	overallAccuracy: number;
 	overallCorrect: number;
 	overallFailed: number;
@@ -58,6 +59,7 @@ type AggregatedRow = {
 	model: string;
 	size: string;
 	timestamp: string;
+	reasoning: number;
 	total: number;
 	runs: number;
 	correct: number;
@@ -76,12 +78,15 @@ type RawRow = {
 	puzzle_id: string;
 	size: string;
 	timestamp: string;
+	reasoning: number;
 	correct: number;
 	status: string;
 	duration_ms: number;
 	tokens: number;
 	cost: number;
 	error_message: string | null;
+	raw_input: string | null;
+	raw_output: string | null;
 };
 
 // Output type for raw results JSON
@@ -90,12 +95,15 @@ type RawResult = {
 	puzzleId: string;
 	size: string;
 	timestamp: string;
+	reasoning: boolean;
 	correct: boolean;
 	status: string;
 	durationMs: number;
 	tokens: number;
 	cost: number;
 	errorMessage: string | null;
+	rawInput: string | null;
+	rawOutput: string | null;
 };
 
 type RawResults = {
@@ -108,10 +116,11 @@ type RawResults = {
 const aggregatedResults = db
 	.query<AggregatedRow, []>(
 		`
-    SELECT 
+    SELECT
       model,
       size,
       MAX(timestamp) as timestamp,
+      MAX(reasoning) as reasoning,
       COUNT(*) as total,
       SUM(CASE WHEN status != 'failed' THEN 1 ELSE 0 END) as runs,
       SUM(correct) as correct,
@@ -190,11 +199,16 @@ function sortSizes(sizes: string[]): string[] {
 
 // Build the results structure
 const modelMap = new Map<string, SizeData[]>();
+const modelReasoningMap = new Map<string, boolean>();
 const allSizes = new Set<string>();
 
 for (const row of aggregatedResults) {
 	if (!modelMap.has(row.model)) {
 		modelMap.set(row.model, []);
+	}
+	// Store reasoning for each model (use first value seen, should be consistent)
+	if (!modelReasoningMap.has(row.model)) {
+		modelReasoningMap.set(row.model, row.reasoning === 1);
 	}
 
 	// Accuracy is calculated from runs (excluding failed), not total
@@ -250,6 +264,7 @@ for (const [model, sizeDatas] of modelMap) {
 	// Overall accuracy uses runs (excluding failed), not total
 	byModel.push({
 		model,
+		reasoning: modelReasoningMap.get(model) ?? false,
 		overallAccuracy: overallRuns > 0 ? (overallCorrect / overallRuns) * 100 : 0,
 		overallCorrect,
 		overallFailed,
@@ -306,12 +321,15 @@ const rawResults = db
       puzzle_id,
       size,
       timestamp,
+      reasoning,
       correct,
       status,
       duration_ms,
       tokens,
       cost,
-      error_message
+      error_message,
+      raw_input,
+      raw_output
     FROM runs
     ORDER BY model, size, timestamp
   `,
@@ -326,12 +344,15 @@ const rawResultsOutput: RawResults = {
 		puzzleId: row.puzzle_id,
 		size: row.size,
 		timestamp: row.timestamp,
+		reasoning: row.reasoning === 1,
 		correct: row.correct === 1,
 		status: row.status,
 		durationMs: row.duration_ms,
 		tokens: row.tokens,
 		cost: row.cost,
 		errorMessage: row.error_message,
+		rawInput: row.raw_input,
+		rawOutput: row.raw_output,
 	})),
 };
 

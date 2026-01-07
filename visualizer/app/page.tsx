@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	Brain,
 	CaretDown,
 	CaretUp,
 	CaretUpDown,
@@ -15,7 +16,6 @@ import {
 	Question,
 	Robot,
 	Rows,
-	Warning,
 	XLogo,
 } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -29,7 +29,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	type ChartConfig,
@@ -60,6 +59,8 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 import resultsData from "./results.json";
 import resultsRawData from "./results-raw.json";
@@ -82,6 +83,7 @@ type SizeData = {
 
 type ModelData = {
 	model: string;
+	reasoning?: boolean; // Whether this is a reasoning model (optional for backward compatibility)
 	overallAccuracy: number;
 	overallCorrect: number;
 	overallFailed: number;
@@ -141,7 +143,6 @@ function getRankColor(rank: number, total: number): string {
 
 	return `oklch(${lightness.toFixed(3)} ${chroma.toFixed(3)} ${hue})`;
 }
-
 
 function formatModelName(name: string): string {
 	return name
@@ -217,9 +218,10 @@ function getModelStats(modelData: ModelData) {
 export default function Page() {
 	const [selectedSize, setSelectedSize] = useState<string>("all");
 	const [aboutOpen, setAboutOpen] = useState(false);
-	const [errorsOpen, setErrorsOpen] = useState(false);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("accuracy");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+	const [showReasoning, setShowReasoning] = useState(true);
+	const [showNonReasoning, setShowNonReasoning] = useState(true);
 
 	const handleSort = (column: SortColumn) => {
 		if (sortColumn === column) {
@@ -243,10 +245,15 @@ export default function Page() {
 
 	const sizes = useMemo(() => ["all", ...results.summary.sizes], []);
 
-	// Detect empty data state
-	const isEmptyData = useMemo(() => {
-		return results.byModel.every((m) => m.overallAccuracy === 0);
-	}, []);
+	// Filter models based on reasoning checkboxes
+	const filteredModels = useMemo(() => {
+		return results.byModel.filter((model) => {
+			const isReasoning = model.reasoning ?? false;
+			if (isReasoning && !showReasoning) return false;
+			if (!isReasoning && !showNonReasoning) return false;
+			return true;
+		});
+	}, [showReasoning, showNonReasoning]);
 
 	const chartData = useMemo(() => {
 		const getChartModelStats = (model: ModelData) => {
@@ -288,7 +295,7 @@ export default function Page() {
 			};
 		};
 
-		const data = results.byModel.map((model) => getChartModelStats(model));
+		const data = filteredModels.map((model) => getChartModelStats(model));
 
 		// Sort by accuracy (highest first), then alphabetically for ties
 		const sorted = data.sort((a, b) => {
@@ -300,10 +307,10 @@ export default function Page() {
 			...item,
 			fill: getRankColor(rank, sorted.length),
 		}));
-	}, [selectedSize]);
+	}, [selectedSize, filteredModels]);
 
 	const sortedModels = useMemo(() => {
-		return [...results.byModel].sort((a, b) => {
+		return [...filteredModels].sort((a, b) => {
 			const statsA = getModelStats(a);
 			const statsB = getModelStats(b);
 
@@ -335,7 +342,7 @@ export default function Page() {
 
 			return primaryResult;
 		});
-	}, [sortColumn, sortDirection]);
+	}, [sortColumn, sortDirection, filteredModels]);
 
 	// Calculate max accuracy for each size column (for highlighting)
 	const maxAccuracyBySize = useMemo(() => {
@@ -344,20 +351,21 @@ export default function Page() {
 
 		for (const size of sizes) {
 			maxValues[size] = Math.max(
-				...results.byModel.map((model) => getAccuracyForSize(model, size))
+				0, // Ensure at least 0 if filteredModels is empty
+				...filteredModels.map((model) => getAccuracyForSize(model, size))
 			);
 		}
 
 		return maxValues;
-	}, []);
+	}, [filteredModels]);
 
 	// Calculate benchmark stats
 	const benchmarkStats = useMemo(() => {
-		const totalModels = results.summary.models.length;
+		const totalModels = filteredModels.length;
 		const puzzlesPerModel = PUZZLES.length;
-		const totalRuns = results.byModel.reduce((sum, model) => sum + getModelRuns(model), 0);
+		const totalRuns = filteredModels.reduce((sum, model) => sum + getModelRuns(model), 0);
 		return { totalModels, totalPuzzles: puzzlesPerModel, totalRuns };
-	}, []);
+	}, [filteredModels]);
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -365,6 +373,34 @@ export default function Page() {
 			<div className="fixed inset-0 grid-pattern pointer-events-none" />
 			{/* Subtle gradient background */}
 			<div className="fixed inset-0 bg-linear-to-br from-primary/5 via-transparent to-chart-2/5 pointer-events-none" />
+
+			{/* Support Banner - full width at top */}
+			<div className="relative w-full bg-linear-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-b border-amber-500/20">
+				<div className="max-w-7xl mx-auto px-6 py-4">
+					<div className="flex flex-col sm:flex-row items-center gap-4">
+						<div className="p-2.5 rounded-lg bg-amber-500/20">
+							<Coffee className="size-5 text-amber-600 dark:text-amber-400" weight="duotone" />
+						</div>
+						<div className="flex-1 text-center sm:text-left">
+							<p className="text-sm text-foreground">
+								Running benchmarks isn&apos;t cheap. Please consider supporting the project.
+							</p>
+							<p className="text-muted-foreground text-xs">
+								All contributions go towards running benchmarks for larger puzzle sizes and new models as they are released.
+							</p>
+						</div>
+						<a
+							href="https://buymeacoffee.com/mauricekleine"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium transition-colors"
+						>
+							<Heart className="size-4" weight="fill" />
+							<span>Support</span>
+						</a>
+					</div>
+				</div>
+			</div>
 
 			<div className="relative max-w-7xl mx-auto px-6 py-12">
 				{/* Header */}
@@ -426,7 +462,7 @@ export default function Page() {
 									<span>Download Results</span>
 									<CaretDown className="size-3" />
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start">
+								<DropdownMenuContent className="w-fit" align="start">
 									<DropdownMenuItem
 										onClick={() => {
 											const blob = new Blob([JSON.stringify(results, null, 2)], {
@@ -497,20 +533,30 @@ export default function Page() {
 					</p>
 				</header>
 
-				{/* Empty Data Warning */}
-				{isEmptyData && (
-					<Alert className="mb-8 border-amber-500/50 bg-amber-500/10">
-						<Warning className="size-4 text-amber-500" weight="bold" />
-						<AlertTitle className="text-amber-600 dark:text-amber-400">
-							No Results Yet
-						</AlertTitle>
-						<AlertDescription className="text-amber-600/80 dark:text-amber-400/80">
-							All models show 0% accuracy. This may indicate the benchmark
-							hasn&apos;t been run yet, or results are still being collected. Run the
-							benchmark to populate this dashboard with real data.
-						</AlertDescription>
-					</Alert>
-				)}
+				{/* Model type filters */}
+				<div className="flex items-center gap-4 my-4 p-3 rounded-lg bg-muted/30 border border-border">
+					<span className="text-xs text-muted-foreground font-medium">Filter by model type:</span>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="reasoning"
+							checked={showReasoning}
+							onCheckedChange={(checked) => setShowReasoning(checked === true)}
+						/>
+						<Label htmlFor="reasoning" className="text-xs cursor-pointer flex items-center gap-1.5">
+							Reasoning models
+						</Label>
+					</div>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="non-reasoning"
+							checked={showNonReasoning}
+							onCheckedChange={(checked) => setShowNonReasoning(checked === true)}
+						/>
+						<Label htmlFor="non-reasoning" className="text-xs cursor-pointer">
+							Non-reasoning models
+						</Label>
+					</div>
+				</div>
 
 				{/* Main Chart */}
 				<section className="mb-10">
@@ -725,6 +771,16 @@ export default function Page() {
 														<span className="font-medium truncate">
 															{formatModelName(modelData.model)}
 														</span>
+														{modelData.reasoning && (
+															<Tooltip>
+																<TooltipTrigger>
+																	<Brain className="size-3.5 text-primary shrink-0" weight="duotone" />
+																</TooltipTrigger>
+																<TooltipContent>
+																	<p>Reasoning model</p>
+																</TooltipContent>
+															</Tooltip>
+														)}
 													</div>
 												</td>
 												<td className="text-left px-4 py-3 border-r border-border/50">
@@ -781,60 +837,6 @@ export default function Page() {
 							</table>
 						</div>
 					</div>
-
-					{/* Error Messages Collapsible */}
-					{results.errorsByModel && results.errorsByModel.length > 0 && (
-						<Collapsible open={errorsOpen} onOpenChange={setErrorsOpen} className="mt-4">
-							<CollapsibleTrigger className="flex items-center gap-2 px-4 py-2.5 w-full text-sm text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/50 border border-border rounded-lg transition-all cursor-pointer">
-								<Warning className="size-4 text-amber-500" weight="bold" />
-								<span className="font-medium">
-									Error Messages ({results.errorsByModel.reduce((sum, m) => sum + m.totalErrors, 0)} total across {results.errorsByModel.length} models)
-								</span>
-								<CaretDown
-									className={`size-4 ml-auto transition-transform ${errorsOpen ? "rotate-180" : ""}`}
-								/>
-							</CollapsibleTrigger>
-							<CollapsibleContent>
-								<div className="mt-3 p-4 rounded-lg bg-muted/30 border border-border text-sm text-muted-foreground space-y-2">
-									<p>
-										Each puzzle in the benchmark is intended to be run 10 times by every model, providing a consistent baseline for comparison. However, various errors can cause the actual number of successful runs to be less than 10 for some model–puzzle combinations.
-									</p>
-									<p>
-										The most common errors occur when models exceed their maximum output token limit, especially with larger grid sizes. As puzzle complexity increases, models often produce lengthy reasoning, resulting in excessive tokens that can fill or overrun the available context window. This frequently leads to truncated or empty responses.
-									</p>
-									<p>
-										Additional failures stem from models not consistently returning valid JSON output. For example, smaller models like <span className="font-mono text-foreground">ministral-14b-2512</span> are particularly prone to struggle on larger grids, often failing to output a properly structured JSON object.
-									</p>
-								</div>
-								<div className="mt-4 space-y-4">
-									{results.errorsByModel.map((modelErrors) => (
-										<div key={modelErrors.model} className="p-4 rounded-lg bg-muted/20 border border-border">
-											<div className="flex items-center justify-between mb-3">
-												<span className="font-medium text-foreground">
-													{formatModelName(modelErrors.model)}
-												</span>
-												<span className="text-xs font-mono text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">
-													{modelErrors.totalErrors} {modelErrors.totalErrors === 1 ? "error" : "errors"}
-												</span>
-											</div>
-											<div className="space-y-2">
-												{modelErrors.errors.map((error, idx) => (
-													<div key={idx} className="flex items-start gap-3 text-sm">
-														<span className="shrink-0 font-mono text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-															×{error.count}
-														</span>
-														<code className="text-xs text-muted-foreground font-mono break-all bg-background/50 px-2 py-1 rounded border border-border/50">
-															{error.message}
-														</code>
-													</div>
-												))}
-											</div>
-										</div>
-									))}
-								</div>
-							</CollapsibleContent>
-						</Collapsible>
-					)}
 				</section>
 
 				{/* Per-Size Stats */}
@@ -844,8 +846,10 @@ export default function Page() {
 					</h2>
 					<div className="grid md:grid-cols-3 gap-6">
 						{results.summary.sizes.map((size) => {
+							// Filter chartData to only include models that pass the reasoning filter
+							const filteredModelNames = new Set(filteredModels.map((m) => m.model));
 							const sizeStats = results.chartData.filter(
-								(d) => d.size === size,
+								(d) => d.size === size && filteredModelNames.has(d.model),
 							);
 							const totalCorrect = sizeStats.reduce(
 								(sum, s) => sum + s.correct,
@@ -922,32 +926,6 @@ export default function Page() {
 						})}
 					</div>
 				</section>
-
-				{/* Support Banner */}
-				<div className="mt-12 p-5 rounded-xl bg-linear-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/20">
-					<div className="flex flex-col sm:flex-row items-center gap-4">
-						<div className="p-2.5 rounded-lg bg-amber-500/20">
-							<Coffee className="size-5 text-amber-600 dark:text-amber-400" weight="duotone" />
-						</div>
-						<div className="flex-1 text-center sm:text-left">
-							<p className="text-sm text-foreground">
-								Running benchmarks isn&apos;t cheap.{" "}
-								<span className="text-muted-foreground">
-									If you find this useful and want to support the project, consider buying me a coffee.
-								</span>
-							</p>
-						</div>
-						<a
-							href="https://buymeacoffee.com/mauricekleine"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium transition-colors"
-						>
-							<Heart className="size-4" weight="fill" />
-							<span>Support</span>
-						</a>
-					</div>
-				</div>
 
 				{/* Footer */}
 				<footer className="mt-8 pt-8 border-t border-border">

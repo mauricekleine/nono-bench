@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "bench": "bun run bench.ts",
-    "export": "bun run export.ts"
+    "export": "bun run export.ts",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest",
